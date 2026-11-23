@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { TextLayer as PdfTextLayer, type PDFDocumentProxy } from 'pdfjs-dist'
+import { TextLayer as PdfTextLayer, type PDFDocumentProxy, type PDFPageProxy } from 'pdfjs-dist'
+import type { TextItem } from 'pdfjs-dist/types/src/display/api'
 
 interface TextLayerProps {
   pdf: PDFDocumentProxy
@@ -27,8 +28,10 @@ export function TextLayer({ pdf, pageNumber, onSpanPointerDown, className = '' }
 
     void pdf.getPage(pageNumber).then(async (page) => {
       if (cancelled) return
+      const textContent = await page.getTextContent({ includeMarkedContent: true, disableNormalization: true })
+      if (cancelled) return
       layer = new PdfTextLayer({
-        textContentSource: page.streamTextContent({ includeMarkedContent: true, disableNormalization: true }),
+        textContentSource: textContent,
         container,
         viewport: page.getViewport({ scale: 1, rotation: 0 })
       })
@@ -36,7 +39,9 @@ export function TextLayer({ pdf, pageNumber, onSpanPointerDown, className = '' }
         await layer.render()
       } catch {
         // Cancelled or a page without text.
+        return
       }
+      annotateSpans(layer, textContent.items, page)
     })
     return () => {
       cancelled = true
@@ -58,4 +63,24 @@ export function TextLayer({ pdf, pageNumber, onSpanPointerDown, className = '' }
   }, [])
 
   return <div ref={containerRef} className={`textLayer ${className}`} />
+}
+
+/**
+ * Stores each run's size, start and baseline on its span, so "Edit Text"
+ * can reuse the original typeface and sit the new text on the old baseline.
+ */
+function annotateSpans(layer: PdfTextLayer, items: unknown[], page: PDFPageProxy): void {
+  const textItems = items.filter((item): item is TextItem => typeof (item as TextItem).str === 'string')
+  const divs = layer.textDivs
+  const strings = layer.textContentItemsStr
+  // Only trust the pairing when pdf.js produced exactly one div per text item.
+  if (divs.length !== textItems.length || strings.some((str, i) => str !== textItems[i].str)) return
+  const [, , , viewTop] = page.view
+  textItems.forEach((item, i) => {
+    const div = divs[i]
+    const [, , c, d, , f] = item.transform
+    div.dataset.pdfX = String(item.transform[4] - page.view[0])
+    div.dataset.pdfSize = String(Math.hypot(c, d))
+    div.dataset.pdfBaseline = String(viewTop - f)
+  })
 }

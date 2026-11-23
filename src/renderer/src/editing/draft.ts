@@ -103,7 +103,8 @@ export function commitDraft(): void {
   const draft = edit().draft
   if (!draft) return
   edit().setDraft(null)
-  const empty = draft.text.trim() === ''
+  // Emptying replaced page text deletes it: the object keeps only its erase area.
+  const empty = draft.text.trim() === '' && !draft.cover
   if (draft.id) {
     if (empty) removeObjects([draft.id])
     else replaceObject(draftToObject(draft, draft.id))

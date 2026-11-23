@@ -16,7 +16,9 @@ const SYSTEM_FONT_FILES: Record<SystemFontId, [string, string, string, string]> 
   palatino: ['pala.ttf', 'palab.ttf', 'palai.ttf', 'palabi.ttf'],
   candara: ['candara.ttf', 'candarab.ttf', 'candarai.ttf', 'candaraz.ttf'],
   constantia: ['constan.ttf', 'constanb.ttf', 'constani.ttf', 'constanz.ttf'],
-  corbel: ['corbel.ttf', 'corbelb.ttf', 'corbeli.ttf', 'corbelz.ttf']
+  corbel: ['corbel.ttf', 'corbelb.ttf', 'corbeli.ttf', 'corbelz.ttf'],
+  // Windows ships no italic Tahoma; the upright faces stand in.
+  tahoma: ['tahoma.ttf', 'tahomabd.ttf', 'tahoma.ttf', 'tahomabd.ttf']
 }
 
 function fontsDirectory(): string {

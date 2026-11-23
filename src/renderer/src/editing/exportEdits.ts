@@ -16,6 +16,7 @@ import {
 import type { PageSize } from '../store/useAppStore'
 import { getFontBytes, layoutLines, lineHeight } from './fonts'
 import { markupLineWidth } from './layout'
+import { eraseText } from './eraseText'
 import { hexToRgb } from './geometry'
 import {
   COMMENT_PADDING,
@@ -38,6 +39,8 @@ interface Context {
   doc: PDFDocument
   fonts: Map<string, Promise<PDFFont>>
   images: Map<Uint8Array, Promise<PDFImage>>
+  /** True when the replaced text was already deleted from the file. */
+  textErased: boolean
 }
 
 function embedFont(ctx: Context, style: TextStyle): Promise<PDFFont> {
@@ -95,13 +98,15 @@ async function drawTextLike(ctx: Context, page: PDFPage, info: PageSize, obj: Te
   const height = Math.max(1, lines.length) * lh + padding * 2
   const font = await embedFont(ctx, obj.style)
 
-  if (obj.kind === 'text' && obj.cover) {
+  if (obj.kind === 'text' && obj.cover && !ctx.textErased) {
     const { x, y } = toUser(info, obj.cover.x, obj.cover.y + obj.cover.height)
     page.drawRectangle({ x, y, width: obj.cover.width, height: obj.cover.height, color: color(obj.cover.color) })
   }
 
-  const ascent = font.heightAtSize(obj.style.size, { descender: false })
   const fullHeight = font.heightAtSize(obj.style.size)
+  // pdf-lib's { descender: false } subtracts the descent twice (ascent - descent),
+  // which drew saved text higher than on screen. Recover the true ascent.
+  const ascent = (fullHeight + font.heightAtSize(obj.style.size, { descender: false })) / 2
   const baselineOffset = (lh - fullHeight) / 2 + ascent
 
   inBox(page, info, { x: obj.x, y: obj.y, width: obj.width, height, rotation: obj.rotation }, () => {
@@ -227,9 +232,13 @@ export async function exportEdits(
   pageSizes: PageSize[]
 ): Promise<Uint8Array> {
   if (objects.length === 0) return bytes
-  const doc = await PDFDocument.load(bytes)
+  const erases = objects.flatMap((o) =>
+    o.kind === 'text' && o.cover ? [{ pageIndex: o.pageIndex, rect: o.cover }] : []
+  )
+  const erased = await eraseText(bytes, erases, pageSizes)
+  const doc = await PDFDocument.load(erased ?? bytes)
   doc.registerFontkit(fontkit)
-  const ctx: Context = { doc, fonts: new Map(), images: new Map() }
+  const ctx: Context = { doc, fonts: new Map(), images: new Map(), textErased: erased !== null }
   const pages = doc.getPages()
 
   for (const obj of objects) {

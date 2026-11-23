@@ -34,6 +34,7 @@
     "electron-vite": "^6.0.0",
     "i18next": "^26.7.2",
     "lucide-react": "^1.69.0",
+    "mupdf": "^1.28.6",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^6.5.438",
     "png-to-ico": "^3.0.2",

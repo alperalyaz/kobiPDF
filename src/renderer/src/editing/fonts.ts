@@ -40,7 +40,8 @@ const SYSTEM_LABELS: Record<SystemFontId, string> = {
   palatino: 'Palatino Linotype',
   candara: 'Candara',
   constantia: 'Constantia',
-  corbel: 'Corbel'
+  corbel: 'Corbel',
+  tahoma: 'Tahoma'
 }
 
 /** Used when a chosen system font cannot be read, so save still embeds a face. */
@@ -57,7 +58,14 @@ const FALLBACK_FAMILY: Record<SystemFontId, 'sans' | 'serif' | 'mono'> = {
   palatino: 'serif',
   constantia: 'serif',
   courier: 'mono',
-  consolas: 'mono'
+  consolas: 'mono',
+  tahoma: 'sans'
+}
+
+/** The font itself when it is installed here, otherwise the closest bundled face. */
+export function usableFont(font: FontFamily): FontFamily {
+  if (isBundled(font) || installedSystemFonts.includes(font)) return font
+  return FALLBACK_FAMILY[font]
 }
 
 export function fontLabel(font: FontFamily): string {

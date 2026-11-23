@@ -32,7 +32,8 @@ export const SYSTEM_FONT_IDS = [
   'palatino',
   'candara',
   'constantia',
-  'corbel'
+  'corbel',
+  'tahoma'
 ] as const
 
 export type SystemFontId = (typeof SYSTEM_FONT_IDS)[number]

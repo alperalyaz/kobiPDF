@@ -1,7 +1,8 @@
 import { useAppStore, type PageSize, type ToolId } from '../store/useAppStore'
 import { useEditStore } from '../store/useEditStore'
 import { commitDraft, nextDraftToken } from './draft'
-import { measureText } from './fonts'
+import { measureText, usableFont } from './fonts'
+import { fontAt } from './pdfFonts'
 import { boundsOfPoints, clientToPage, rgbToHex } from './geometry'
 import { changeObjects } from './history'
 import { newId, type FontFamily, type MarkupObject, type MarkupType, type Rect } from './types'
@@ -168,6 +169,7 @@ function fontFromCss(fontFamily: string): FontFamily {
     ['candara', 'candara'],
     ['constantia', 'constantia'],
     ['corbel', 'corbel'],
+    ['tahoma', 'tahoma'],
     ['arial', 'arial']
   ]
   for (const [needle, family] of match) {
@@ -178,7 +180,73 @@ function fontFromCss(fontFamily: string): FontFamily {
   return 'sans'
 }
 
-/** "Edit Text": covers a text run on the page and opens it as an editable box. */
+/**
+ * Maps a PDF font name such as "ABCDEF+LiberationSans-Bold" or "Arial,Bold" to
+ * a face we can draw with. Metric-compatible clones map to the Windows font.
+ */
+function fontFromPdfName(pdfName: string): { font: FontFamily; bold: boolean; italic: boolean } | null {
+  const name = pdfName.replace(/^[A-Z]{6}\+/, '').toLowerCase().replace(/[\s_-]/g, '')
+  if (!name) return null
+  const match: [string, FontFamily][] = [
+    ['liberationsans', 'arial'],
+    ['arimo', 'arial'],
+    ['helvetica', 'arial'],
+    ['arial', 'arial'],
+    ['liberationserif', 'times'],
+    ['tinos', 'times'],
+    ['times', 'times'],
+    ['liberationmono', 'courier'],
+    ['cousine', 'courier'],
+    ['courier', 'courier'],
+    ['carlito', 'calibri'],
+    ['calibri', 'calibri'],
+    ['tahoma', 'tahoma'],
+    ['verdana', 'verdana'],
+    ['georgia', 'georgia'],
+    ['trebuchet', 'trebuchet'],
+    ['segoe', 'segoe'],
+    ['consolas', 'consolas'],
+    ['palatino', 'palatino'],
+    ['candara', 'candara'],
+    ['constantia', 'constantia'],
+    ['corbel', 'corbel'],
+    ['dejavusansmono', 'mono'],
+    ['dejavuserif', 'serif'],
+    ['dejavusans', 'sans']
+  ]
+  const hit = match.find(([needle]) => name.includes(needle))
+  if (!hit) return null
+  return {
+    font: hit[1],
+    bold: /bold|black|heavy|semibold|demi/.test(name),
+    italic: /italic|oblique/.test(name)
+  }
+}
+
+/** Ascent and descent (em fractions) of each face, for placing the baseline. */
+function fontMetrics(font: FontFamily): { ascent: number; descent: number } {
+  switch (font) {
+    case 'sans':
+    case 'mono':
+      return { ascent: 0.928, descent: 0.236 }
+    case 'serif':
+      return { ascent: 0.939, descent: 0.236 }
+    case 'times':
+      return { ascent: 0.891, descent: 0.216 }
+    case 'courier':
+      return { ascent: 0.833, descent: 0.3 }
+    case 'calibri':
+      return { ascent: 0.75, descent: 0.25 }
+    case 'tahoma':
+      return { ascent: 1.0, descent: 0.207 }
+    case 'verdana':
+      return { ascent: 1.005, descent: 0.21 }
+    default:
+      return { ascent: 0.905, descent: 0.212 }
+  }
+}
+
+/** "Edit Text": replaces a text run on the page through an editable box. */
 export function editPageText(span: HTMLElement, pageIndex: number): void {
   const text = span.textContent ?? ''
   const wrapper = pageWrapper(pageIndex + 1)
@@ -190,27 +258,36 @@ export function editPageText(span: HTMLElement, pageIndex: number): void {
   const clientRect = span.getBoundingClientRect()
   const rect = clientRectToPage(clientRect, wrapper.getBoundingClientRect(), size, zoom)
   const canvas = wrapper.querySelector('canvas')
-  const fontSize = Math.max(4, Math.round(rect.height * 10) / 10)
+  const pdfSize = Number(span.dataset.pdfSize)
+  const fontSize = Math.max(4, Math.round((pdfSize > 0 ? pdfSize : rect.height) * 10) / 10)
+  const baseline = span.dataset.pdfBaseline ? Number(span.dataset.pdfBaseline) : NaN
+  const pdfX = span.dataset.pdfX ? Number(span.dataset.pdfX) : NaN
   const { settings } = useEditStore.getState()
   const style = {
     ...settings.text,
-    font: fontFromCss(span.style.fontFamily),
+    font: usableFont(fontFromCss(span.style.fontFamily)),
     size: fontSize,
     color: canvas ? inkInside(canvas, clientRect) : settings.text.color,
     bold: false,
     italic: false,
     align: 'left' as const
   }
-  const width = Math.max(rect.width, measureText(text, style)) + fontSize * 0.5
   const lineH = fontSize * 1.2
+  /** Top of the box that puts the new baseline exactly on the old one. */
+  const topFor = (font: FontFamily): number => {
+    if (!Number.isFinite(baseline)) return rect.y - (lineH - rect.height) / 2
+    const { ascent, descent } = fontMetrics(font)
+    return baseline - ((lineH - (ascent + descent) * fontSize) / 2 + ascent * fontSize)
+  }
+  const token = nextDraftToken()
   useEditStore.getState().select(null)
   useEditStore.getState().setDraft({
     kind: 'text',
     id: null,
     pageIndex,
     x: rect.x,
-    y: rect.y - (lineH - rect.height) / 2,
-    width,
+    y: topFor(style.font),
+    width: Math.max(rect.width, measureText(text, style)) + fontSize * 0.5,
     rotation: 0,
     text,
     originalText: text,
@@ -224,6 +301,26 @@ export function editPageText(span: HTMLElement, pageIndex: number): void {
       height: rect.height + 2,
       color: canvas ? backgroundAround(canvas, clientRect) : '#ffffff'
     },
-    token: nextDraftToken()
+    token
+  })
+
+  // Switch to the original typeface once it is known (MuPDF loads on first use).
+  if (!Number.isFinite(baseline) || !Number.isFinite(pdfX)) return
+  void fontAt(doc.bytes, pageIndex, size, pdfX, baseline).then((runFont) => {
+    const draft = useEditStore.getState().draft
+    if (!runFont || !draft || draft.token !== token) return
+    const match = fontFromPdfName(runFont.name)
+    const font = usableFont(match?.font ?? draft.style.font)
+    const next = {
+      ...draft.style,
+      font,
+      bold: runFont.bold || Boolean(match?.bold),
+      italic: runFont.italic || Boolean(match?.italic)
+    }
+    useEditStore.getState().updateDraft({
+      style: next,
+      y: topFor(font),
+      width: Math.max(rect.width, measureText(draft.text, next)) + fontSize * 0.5
+    })
   })
 }
