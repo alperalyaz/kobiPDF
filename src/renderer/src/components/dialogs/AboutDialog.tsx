@@ -26,12 +26,12 @@ export function AboutDialog({ onClose }: { onClose: () => void }): JSX.Element {
           <p className="text-[11px] uppercase tracking-wide text-ink-muted">{t('app.developer')}</p>
           <p className="mt-1 text-[14px] font-semibold text-ink">Hidroteknik</p>
           <a
-            href="https://www.hidroteknik.com.tr"
+            href="https://www.hidroteknik.si"
             target="_blank"
             rel="noreferrer"
             className="mt-0.5 inline-block text-[12px] text-brand hover:underline"
           >
-            www.hidroteknik.com.tr
+            www.hidroteknik.si
           </a>
         </div>
         <p className="mt-4 text-[11px] text-ink-muted">{t('app.rights', { year: YEAR })}</p>

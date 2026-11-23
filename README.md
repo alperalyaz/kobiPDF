@@ -4,7 +4,7 @@ Hidroteknik'ten emek dünyasına armağan: ücretsiz, çevrimdışı çalışan 
 
 ![kobiPDF](docs/screenshot.png)
 
-Web: [www.hidroteknik.com.tr](https://www.hidroteknik.com.tr)
+Web: [www.hidroteknik.si](https://www.hidroteknik.si)
 
 ## Bu sürümde
 
