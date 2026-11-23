@@ -4,7 +4,7 @@ Hidroteknik'ten emek dünyasına armağan: ücretsiz, çevrimdışı çalışan 
 
 ![kobiPDF](docs/screenshot.png)
 
-İlk sürümü Serkan Yavuz Mercan'ın PDFPro projesine dayanır.
+Web: [www.hidroteknik.com.tr](https://www.hidroteknik.com.tr)
 
 ## Bu sürümde
 

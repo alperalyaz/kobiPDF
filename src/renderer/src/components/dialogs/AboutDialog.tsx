@@ -24,14 +24,14 @@ export function AboutDialog({ onClose }: { onClose: () => void }): JSX.Element {
         <p className="mt-3 max-w-[300px] leading-relaxed text-ink">{t('app.aboutText')}</p>
         <div className="mt-4 w-full border-t border-chrome-border pt-3">
           <p className="text-[11px] uppercase tracking-wide text-ink-muted">{t('app.developer')}</p>
-          <p className="mt-1 text-[14px] font-semibold text-ink">Serkan Yavuz Mercan</p>
+          <p className="mt-1 text-[14px] font-semibold text-ink">Hidroteknik</p>
           <a
-            href="mailto:serkanyavuzmercan@gmail.com"
+            href="https://www.hidroteknik.com.tr"
             target="_blank"
             rel="noreferrer"
             className="mt-0.5 inline-block text-[12px] text-brand hover:underline"
           >
-            serkanyavuzmercan@gmail.com
+            www.hidroteknik.com.tr
           </a>
         </div>
         <p className="mt-4 text-[11px] text-ink-muted">{t('app.rights', { year: YEAR })}</p>
