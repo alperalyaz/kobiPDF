@@ -88,7 +88,7 @@
     "reorderPages": "Reorder Pages",
     "mergePdfs": "Merge PDFs",
     "splitPdf": "Split PDF",
-    "drawSignature": "Draw Signature",
+    "drawSignature": "Sign / Stamp",
     "imageSignature": "Image Signature",
     "deleteObject": "Delete Object",
     "movePagesUp": "Move Pages Up",
@@ -156,12 +156,13 @@
       "noPrinter": "No printer found. The default printer will be used."
     },
     "signature": {
-      "title": "Draw signature",
+      "title": "Signature and stamp",
       "place": "Place",
       "clear": "Clear",
       "upload": "Upload image",
-      "useLast": "Use last signature",
-      "hint": "Draw with the mouse or a pen, or upload an image. A transparent PNG stays transparent on the document."
+      "hint": "Draw with a mouse or pen, or upload a stamp or signature image. Transparent PNGs stay transparent. Everything you place is kept in the list above for next time.",
+      "saved": "Saved signatures and stamps (click to place)",
+      "remove": "Remove from list"
     }
   },
   "sidebar": {

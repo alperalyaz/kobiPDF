@@ -88,7 +88,7 @@
     "reorderPages": "Sayfaları Sırala",
     "mergePdfs": "PDF Birleştir",
     "splitPdf": "PDF Böl",
-    "drawSignature": "İmza Çiz",
+    "drawSignature": "İmza / Kaşe",
     "imageSignature": "Resim İmza",
     "deleteObject": "Nesneyi Sil",
     "movePagesUp": "Sayfaları Yukarı Taşı",
@@ -156,12 +156,13 @@
       "noPrinter": "Yazıcı bulunamadı. Varsayılan yazıcı kullanılacak."
     },
     "signature": {
-      "title": "İmza çiz",
+      "title": "İmza ve kaşe",
       "place": "Yerleştir",
       "clear": "Temizle",
       "upload": "Resim yükle",
-      "useLast": "Son imzayı kullan",
-      "hint": "Fare veya kalemle çizin ya da bilgisayardan resim yükleyin. Şeffaf bir PNG belgede de şeffaf kalır."
+      "hint": "Fare veya kalemle çizin ya da kaşe ve imza resmi yükleyin. Şeffaf PNG belgede de şeffaf kalır. Yerleştirdikleriniz bir dahaki sefere yukarıdaki listede durur.",
+      "saved": "Kayıtlı imza ve kaşeler (tıklayınca yerleşir)",
+      "remove": "Listeden sil"
     }
   },
   "sidebar": {

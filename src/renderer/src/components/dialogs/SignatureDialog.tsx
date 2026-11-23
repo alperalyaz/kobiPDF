@@ -8,7 +8,12 @@ const CANVAS_WIDTH = 520
 const CANVAS_HEIGHT = 200
 const PIXEL_RATIO = 2
 const COLORS = ['#111827', '#1d4ed8', '#d71920']
-const STORAGE_KEY = 'kobipdf.lastSignature'
+/** Older single-signature key; migrated into the saved list on first open. */
+const LEGACY_KEY = 'kobipdf.lastSignature'
+const SAVED_KEY = 'kobipdf.savedSignatures'
+const MAX_SAVED = 12
+
+type SavedSignature = Pick<SignatureResult, 'src' | 'format' | 'width' | 'height'>
 
 function dataUrlToBytes(dataUrl: string): Uint8Array {
   const binary = atob(dataUrl.slice(dataUrl.indexOf(',') + 1))
@@ -70,15 +75,37 @@ function toResult(canvas: HTMLCanvasElement): SignatureResult {
   }
 }
 
-function remember(result: SignatureResult): void {
+function readSaved(): SavedSignature[] {
   try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ src: result.src, format: result.format, width: result.width, height: result.height })
-    )
+    const raw = localStorage.getItem(SAVED_KEY)
+    if (raw) return JSON.parse(raw) as SavedSignature[]
+    const legacy = localStorage.getItem(LEGACY_KEY)
+    if (legacy?.startsWith('{')) return [JSON.parse(legacy) as SavedSignature]
   } catch {
-    // Storage full; the signature is still placed.
+    // Unreadable storage: start with an empty list.
   }
+  return []
+}
+
+/** Writes the list, dropping the oldest entries if browser storage is full. */
+function writeSaved(list: SavedSignature[]): SavedSignature[] {
+  let kept = list.slice(0, MAX_SAVED)
+  while (kept.length > 0) {
+    try {
+      localStorage.setItem(SAVED_KEY, JSON.stringify(kept))
+      localStorage.removeItem(LEGACY_KEY)
+      return kept
+    } catch {
+      kept = kept.slice(0, -1)
+    }
+  }
+  return kept
+}
+
+/** Newest first; placing a saved one again moves it to the front. */
+function remember(result: SignatureResult): void {
+  const entry: SavedSignature = { src: result.src, format: result.format, width: result.width, height: result.height }
+  writeSaved([entry, ...readSaved().filter((s) => s.src !== entry.src)])
 }
 
 function bytesToDataUrl(bytes: Uint8Array, format: 'png' | 'jpg'): Promise<string> {
@@ -101,7 +128,7 @@ export function SignatureDialog(): JSX.Element {
   const [color, setColor] = useState(COLORS[0])
   const [width, setWidth] = useState(2.5)
   const [empty, setEmpty] = useState(true)
-  const [saved] = useState(() => localStorage.getItem(STORAGE_KEY))
+  const [saved, setSaved] = useState(readSaved)
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext('2d')
@@ -198,25 +225,14 @@ export function SignatureDialog(): JSX.Element {
     closeDialog(result)
   }
 
-  const applySaved = async (): Promise<void> => {
-    if (!saved) return
-    if (saved.startsWith('{')) {
-      try {
-        const stored = JSON.parse(saved) as Pick<SignatureResult, 'src' | 'format' | 'width' | 'height'>
-        closeDialog({ ...stored, bytes: dataUrlToBytes(stored.src) })
-      } catch (err) {
-        console.error(err)
-      }
-      return
-    }
-    const img = await loadImage(saved)
-    closeDialog({
-      src: saved,
-      bytes: dataUrlToBytes(saved),
-      format: 'png',
-      width: img.naturalWidth / PIXEL_RATIO,
-      height: img.naturalHeight / PIXEL_RATIO
-    } satisfies SignatureResult)
+  const applySaved = (entry: SavedSignature): void => {
+    const result = { ...entry, bytes: dataUrlToBytes(entry.src) }
+    remember(result)
+    closeDialog(result)
+  }
+
+  const removeSaved = (entry: SavedSignature): void => {
+    setSaved(writeSaved(saved.filter((s) => s.src !== entry.src)))
   }
 
   return (
@@ -226,9 +242,6 @@ export function SignatureDialog(): JSX.Element {
       onCancel={() => closeDialog(null)}
       footer={
         <>
-          {saved && (
-            <DialogButton onClick={() => void applySaved()}>{t('dialogs.signature.useLast')}</DialogButton>
-          )}
           <span className="flex-1" />
           <DialogButton onClick={() => closeDialog(null)}>{t('common.cancel')}</DialogButton>
           <DialogButton variant="primary" disabled={empty} onClick={accept}>
@@ -238,6 +251,34 @@ export function SignatureDialog(): JSX.Element {
       }
     >
       <div className="flex flex-col gap-2">
+        {saved.length > 0 && (
+          <div className="flex flex-col gap-1">
+            <span className="text-ink-muted">{t('dialogs.signature.saved')}</span>
+            <div className="flex flex-wrap gap-2">
+              {saved.map((entry) => (
+                <div key={entry.src.slice(-48)} className="group relative">
+                  <button
+                    type="button"
+                    title={t('dialogs.signature.place')}
+                    onClick={() => applySaved(entry)}
+                    className="flex h-14 w-24 items-center justify-center rounded border border-chrome-border bg-white p-1 hover:border-brand"
+                  >
+                    <img src={entry.src} alt="" className="max-h-full max-w-full object-contain" draggable={false} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={t('dialogs.signature.remove')}
+                    title={t('dialogs.signature.remove')}
+                    onClick={() => removeSaved(entry)}
+                    className="absolute -right-1.5 -top-1.5 hidden size-5 items-center justify-center rounded-full bg-ink text-[11px] leading-none text-white group-hover:flex"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             {COLORS.map((c) => (

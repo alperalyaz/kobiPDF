@@ -513,8 +513,8 @@ export function PageLayers({ pdf, pageIndex, size, zoom, visible }: PageLayersPr
             y={liveRect.y}
             width={liveRect.width}
             height={liveRect.height}
-            fill="rgb(215 25 32 / 0.06)"
-            stroke="#d71920"
+            fill="rgb(19 92 169 / 0.06)"
+            stroke="#135ca9"
             strokeWidth={1 / zoom}
             strokeDasharray={`${4 / zoom} ${3 / zoom}`}
           />

@@ -1,4 +1,4 @@
-// Generates app/installer icons and the in-app logo from resources/logo.jpg.
+// Generates app/installer icons and the in-app logo from resources/logo.svg.
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -6,46 +6,14 @@ import sharp from 'sharp'
 import pngToIco from 'png-to-ico'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const source = resolve(root, 'resources/logo.jpg')
+const source = resolve(root, 'resources/logo.svg')
 const buildDir = resolve(root, 'build')
 const rendererAssets = resolve(root, 'src/renderer/src/assets')
 const SIZE = 1024
-const BACKGROUND_THRESHOLD = 48
 
-/** Bounding box of the non-black badge, so the JPG's black background can be dropped. */
-async function findBadgeBounds() {
-  const { data, info } = await sharp(source).raw().toBuffer({ resolveWithObject: true })
-  let minX = info.width
-  let minY = info.height
-  let maxX = 0
-  let maxY = 0
-  for (let y = 0; y < info.height; y++) {
-    for (let x = 0; x < info.width; x++) {
-      const i = (y * info.width + x) * info.channels
-      if (Math.max(data[i], data[i + 1], data[i + 2]) > BACKGROUND_THRESHOLD) {
-        if (x < minX) minX = x
-        if (y < minY) minY = y
-        if (x > maxX) maxX = x
-        if (y > maxY) maxY = y
-      }
-    }
-  }
-  return { left: minX, top: minY, width: maxX - minX + 1, height: maxY - minY + 1 }
-}
-
+/** The SVG already has its rounded corners and transparent background. */
 async function buildMasterIcon() {
-  const bounds = await findBadgeBounds()
-  const radius = Math.round(SIZE * 0.18)
-  const mask = Buffer.from(
-    `<svg width="${SIZE}" height="${SIZE}"><rect x="0" y="0" width="${SIZE}" height="${SIZE}" rx="${radius}" ry="${radius}" fill="#fff"/></svg>`
-  )
-  return sharp(source)
-    .extract(bounds)
-    .resize(SIZE, SIZE, { fit: 'fill' })
-    .ensureAlpha()
-    .composite([{ input: mask, blend: 'dest-in' }])
-    .png()
-    .toBuffer()
+  return sharp(source, { density: 300 }).resize(SIZE, SIZE).png().toBuffer()
 }
 
 async function main() {

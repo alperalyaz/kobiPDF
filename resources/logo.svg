@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a9cd6"/>
+      <stop offset="1" stop-color="#0e4783"/>
+    </linearGradient>
+    <clipPath id="page">
+      <path d="M262 150 H622 L782 310 V814 Q782 874 722 874 H322 Q262 874 262 814 Z"/>
+    </clipPath>
+  </defs>
+  <rect width="1024" height="1024" rx="190" fill="url(#bg)"/>
+  <path d="M262 150 H622 L782 310 V814 Q782 874 722 874 H322 Q262 874 262 814 Z" fill="#ffffff"/>
+  <path d="M622 150 V270 Q622 310 662 310 H782 Z" fill="#cfe3f5"/>
+  <g fill="#135ca9">
+    <rect x="342" y="372" width="300" height="40" rx="20"/>
+    <rect x="342" y="452" width="360" height="40" rx="20"/>
+    <rect x="342" y="532" width="250" height="40" rx="20"/>
+  </g>
+  <g clip-path="url(#page)">
+    <path d="M200 700 C320 630 440 630 560 690 S800 760 860 700 V900 H200 Z" fill="#1a9cd6"/>
+    <path d="M200 760 C320 700 440 700 560 755 S800 825 860 765 V900 H200 Z" fill="#135ca9"/>
+  </g>
+</svg>
