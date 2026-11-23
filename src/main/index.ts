@@ -37,7 +37,7 @@ const gotLock = app.requestSingleInstanceLock()
 if (!gotLock) {
   app.quit()
 } else {
-  app.setAppUserModelId('com.pdfpro.app')
+  app.setAppUserModelId('com.hidroteknik.kobipdf')
   registerAppScheme()
 
   app.on('second-instance', (_event, argv) => {

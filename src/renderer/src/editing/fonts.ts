@@ -81,7 +81,7 @@ export function fontChoices(): { id: FontFamily; label: string }[] {
 
 /** The same files are used on screen and embedded on save, so wrapping matches. */
 export function cssFontFamily(font: FontFamily): string {
-  return `"PDFPro ${font}"`
+  return `"kobiPDF ${font}"`
 }
 
 function variantOf(style: Pick<TextStyle, 'bold' | 'italic'>): 0 | 1 | 2 | 3 {
@@ -105,7 +105,7 @@ function notifyFonts(): void {
 }
 
 async function loadFace(family: FontFamily, bytes: ArrayBuffer, style: Pick<TextStyle, 'bold' | 'italic'>): Promise<void> {
-  const face = new FontFace(`PDFPro ${family}`, bytes, {
+  const face = new FontFace(`kobiPDF ${family}`, bytes, {
     weight: style.bold ? '700' : '400',
     style: style.italic ? 'italic' : 'normal'
   })

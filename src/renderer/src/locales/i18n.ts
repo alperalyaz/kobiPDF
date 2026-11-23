@@ -4,7 +4,7 @@ import type { AppLanguage } from '../../../shared/ipc'
 import en from './en.json'
 import tr from './tr.json'
 
-const STORAGE_KEY = 'pdfpro.language'
+const STORAGE_KEY = 'kobipdf.language'
 
 function initialLanguage(): AppLanguage {
   const saved = localStorage.getItem(STORAGE_KEY)

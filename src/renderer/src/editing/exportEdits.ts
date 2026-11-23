@@ -210,7 +210,7 @@ function addNoteAnnotation(ctx: Context, page: PDFPage, info: PageSize, obj: Not
     Subtype: 'Text',
     Rect: [topLeft.x, topLeft.y - NOTE_SIZE, topLeft.x + NOTE_SIZE, topLeft.y],
     Contents: PDFHexString.fromText(obj.text),
-    T: PDFHexString.fromText('PDFPro'),
+    T: PDFHexString.fromText('kobiPDF'),
     M: PDFString.fromDate(new Date()),
     Name: 'Comment',
     C: [r, g, b],

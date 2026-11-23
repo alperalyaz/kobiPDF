@@ -7,7 +7,7 @@ import tailwindcss from '@tailwindcss/vite'
 /** Injects the Content-Security-Policy; dev additionally allows Vite's HMR client. */
 function contentSecurityPolicy(): Plugin {
   return {
-    name: 'pdfpro-csp',
+    name: 'kobipdf-csp',
     transformIndexHtml(_html, ctx) {
       const dev = Boolean(ctx.server)
       const policy = [

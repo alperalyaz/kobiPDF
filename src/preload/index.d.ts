@@ -1,8 +1,8 @@
-import type { PdfProApi } from '../shared/ipc'
+import type { KobiPdfApi } from '../shared/ipc'
 
 declare global {
   interface Window {
-    api: PdfProApi
+    api: KobiPdfApi
   }
 }
 

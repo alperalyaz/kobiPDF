@@ -1,11 +1,11 @@
 {
-  "name": "pdfpro",
-  "productName": "PDFPro",
+  "name": "kobipdf",
+  "productName": "kobiPDF",
   "version": "0.4.0",
-  "description": "PDFPro - Professional desktop PDF editor",
+  "description": "kobiPDF - Free desktop PDF editor",
   "main": "./out/main/index.js",
-  "author": "PDFPro",
-  "license": "UNLICENSED",
+  "author": "Hidroteknik",
+  "license": "AGPL-3.0-only",
   "private": true,
   "scripts": {
     "icons": "node scripts/generate-icons.mjs",

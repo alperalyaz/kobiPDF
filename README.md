@@ -1,14 +1,10 @@
-# PDFPro
+# kobiPDF
 
-Çevrimdışı çalışan masaüstü PDF görüntüleyici ve düzenleyici. Electron, React, TypeScript ve TailwindCSS ile yazılmıştır.
+Hidroteknik'ten emek dünyasına armağan: ücretsiz, çevrimdışı çalışan masaüstü PDF görüntüleyici ve düzenleyici. Electron, React, TypeScript ve TailwindCSS ile yazılmıştır.
 
-![PDFPro](docs/screenshot.png)
+![kobiPDF](docs/screenshot.png)
 
-## Kurulum
-
-Windows kurulumu GitHub sürümünden indirilir: [PDFPro-Setup-0.4.0.exe](https://github.com/serkanyavuzmercan-gif/PDFPro/releases/download/v0.4.0/PDFPro-Setup-0.4.0.exe)
-
-Kurulum sihirbazı kurulum klasörünü seçmenize izin verir ve masaüstü kısayolu oluşturur. `.pdf` dosyaları PDFPro ile açılır.
+İlk sürümü Serkan Yavuz Mercan'ın PDFPro projesine dayanır.
 
 ## Bu sürümde
 
@@ -47,3 +43,7 @@ npm run dist:win
 ```
 
 Çıktı `release/` altındadır. macOS için `npm run dist:mac` bir Mac üzerinde çalıştırılır.
+
+## Lisans
+
+© 2026 Hidroteknik. GNU Affero Genel Kamu Lisansı sürüm 3 (AGPL-3.0) ile dağıtılır. Ayrıntı için `LICENSE` dosyasına bakın.

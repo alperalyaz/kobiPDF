@@ -1,11 +1,11 @@
 {
   "app": {
-    "name": "PDFPro",
-    "about": "PDFPro - Professional PDF Editor",
+    "name": "kobiPDF",
+    "about": "kobiPDF - Free PDF Editor by Hidroteknik",
     "aboutTitle": "About",
     "aboutText": "An offline desktop application for opening, editing, and printing documents on your computer.",
     "developer": "Developer",
-    "rights": "© {{year}} Serkan Yavuz Mercan. All rights reserved."
+    "rights": "© {{year}} Hidroteknik. Free software under the AGPL-3.0 license."
   },
   "common": {
     "language": "Language",

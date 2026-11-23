@@ -1,11 +1,11 @@
 {
   "app": {
-    "name": "PDFPro",
-    "about": "PDFPro - Profesyonel PDF Düzenleyici",
+    "name": "kobiPDF",
+    "about": "kobiPDF - Hidroteknik'in ücretsiz PDF düzenleyicisi",
     "aboutTitle": "Hakkında",
     "aboutText": "Belgelerinizi bilgisayarınızda açmak, düzenlemek ve yazdırmak için tasarlanmış çevrimdışı bir masaüstü uygulamasıdır.",
     "developer": "Geliştirici",
-    "rights": "© {{year}} Serkan Yavuz Mercan. Tüm hakları saklıdır."
+    "rights": "© {{year}} Hidroteknik. AGPL-3.0 lisansıyla özgür yazılımdır."
   },
   "common": {
     "language": "Dil",

@@ -8,7 +8,7 @@ const CANVAS_WIDTH = 520
 const CANVAS_HEIGHT = 200
 const PIXEL_RATIO = 2
 const COLORS = ['#111827', '#1d4ed8', '#d71920']
-const STORAGE_KEY = 'pdfpro.lastSignature'
+const STORAGE_KEY = 'kobipdf.lastSignature'
 
 function dataUrlToBytes(dataUrl: string): Uint8Array {
   const binary = atob(dataUrl.slice(dataUrl.indexOf(',') + 1))

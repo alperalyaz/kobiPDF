@@ -17,7 +17,7 @@ export function createMainWindow(): BrowserWindow {
     minWidth: 960,
     minHeight: 640,
     show: false,
-    title: 'PDFPro',
+    title: 'kobiPDF',
     icon: getIconPath(),
     backgroundColor: '#e9eaee',
     titleBarStyle: isMac ? 'hiddenInset' : 'hidden',

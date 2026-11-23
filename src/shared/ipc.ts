@@ -77,7 +77,7 @@ export interface PrintRequest {
   copies: number
 }
 
-export interface PdfProApi {
+export interface KobiPdfApi {
   platform: string
   openFile: () => Promise<Result<OpenedFile>>
   openFiles: () => Promise<Result<OpenedFile[]>>

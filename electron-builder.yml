@@ -1,6 +1,6 @@
-appId: com.pdfpro.app
-productName: PDFPro
-copyright: Copyright © 2026 PDFPro
+appId: com.hidroteknik.kobipdf
+productName: kobiPDF
+copyright: Copyright © 2026 Hidroteknik
 
 directories:
   buildResources: build
@@ -25,7 +25,7 @@ fileAssociations:
     role: Editor
 
 win:
-  executableName: PDFPro
+  executableName: kobiPDF
   icon: build/icon.ico
   target:
     - target: nsis
@@ -37,7 +37,7 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: always
   createStartMenuShortcut: true
-  shortcutName: PDFPro
+  shortcutName: kobiPDF
   installerIcon: build/icon.ico
   uninstallerIcon: build/icon.ico
   installerHeaderIcon: build/icon.ico

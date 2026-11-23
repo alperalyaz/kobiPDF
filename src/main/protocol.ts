@@ -2,7 +2,7 @@ import { join, normalize, relative, isAbsolute } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { net, protocol } from 'electron'
 
-export const APP_SCHEME = 'pdfpro'
+export const APP_SCHEME = 'kobipdf'
 export const APP_ORIGIN = `${APP_SCHEME}://app`
 
 /** Must run before app "ready". */

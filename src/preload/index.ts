@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
-import { IpcChannels, type PdfProApi } from '../shared/ipc'
+import { IpcChannels, type KobiPdfApi } from '../shared/ipc'
 
 function subscribe<T extends unknown[]>(channel: string, callback: (...args: T) => void): () => void {
   const listener = (_event: IpcRendererEvent, ...args: unknown[]): void => callback(...(args as T))
@@ -7,7 +7,7 @@ function subscribe<T extends unknown[]>(channel: string, callback: (...args: T) 
   return () => ipcRenderer.removeListener(channel, listener)
 }
 
-const api: PdfProApi = {
+const api: KobiPdfApi = {
   platform: process.platform,
   openFile: () => ipcRenderer.invoke(IpcChannels.fileOpen),
   openFiles: () => ipcRenderer.invoke(IpcChannels.fileOpenMany),
