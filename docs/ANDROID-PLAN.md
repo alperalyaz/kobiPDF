@@ -1,7 +1,7 @@
 # kobiPDF Android planı (Capacitor, aynı repo)
 
 Durum: Adım 0, 1 ve 2 tamamlandı (24.11.2026; Adım 1 `bekleyen/android-adim1`, Adım 2 `bekleyen/android-adim2` dalı,
-adım 2 adım 1'in üstüne kurulu). Sıradaki: Adım 3 (Birlikte aç / Paylaş ile gelen PDF) ve Adım 4 (yazı tipleri).
+adım 2 adım 1'in üstüne kurulu); Adım 3 `bekleyen/android-adim3` (adım 2'nin üstüne). Sıradaki: Adım 4 (yazı tipleri).
 Plan eleştirisinden geçti; bulgular aşağıya işlendi.
 
 ## Derleme (Windows, USB ile bağlı telefon)
@@ -120,6 +120,30 @@ yakınlaştırma ve alt sınır; 210 sayfanın sonuna kaydırınca bellek artmı
 - AndroidManifest: `application/pdf` için VIEW ve SEND. Gelen dosyayı web tarafına aktarmak için MainActivity'de küçük Kotlin kodu.
 - Döndürme ve arka plana atmada düzenleme kaybolmasın: `configChanges` ayarı.
 - Dosya seçici: bakımı süren bir eklenti ya da kendi küçük kodumuz. `MANAGE_EXTERNAL_STORAGE` izni kullanılmaz (Play politikası).
+
+**Yapılan (plan eleştirisinden sonra):**
+- Manifest: VIEW ve SEND, yalnız `application/pdf` (octet-stream her ikili dosyada kobiPDF'i önerirdi; bilerek yok).
+  Birden çok dosya paylaşma (SEND_MULTIPLE) yok. Dosya seçici Adım 1'deki `<input type=file>` olarak kaldı.
+- `IncomingFilePlugin.java` (Java, Kotlin değil): gelen dosya yerel kuyrukta bekler, sayfa ister (`takePending`); olay
+  yalnız "bak" sinyali. Soğuk açılışta da kaybolmaz. Sayfaya yalnız kısa bir kimlik gider, content:// adresi değil.
+  `copy` dosyayı önbelleğe akışla kopyalar, `%PDF` imzasını denetler; sayfa kopyayı yerel sunucudan okur (köprüden base64
+  geçmez), sonra `discard`. Ad: DISPLAY_NAME, yoksa başlık, yoksa adresin son parçası.
+- MainActivity: geri yüklenen etkinlikte (süreç ölümü, Son kullanılanlar) açılış intent'i yeniden açılmaz, izni zaten yok.
+- Sayfa (`openIncoming`): tek kuyruk, sırayla; kayıt sürerken gelen dosya kaydın bitmesini bekler. Önce kopyala ve
+  doğrula ("Belge yükleniyor..."), sonra "kaydedilsin mi?", sonra açık belgenin yerine geç.
+- Ekran kapalıyken sayfa animasyon karesi almaz: kaydetme göstergesi artık onu beklemiyor.
+- `configChanges` Capacitor'dan geliyor (döndürmede etkinlik yeniden kurulmaz).
+
+**Telefonda denenen (adb ile VIEW / SEND, okuma izniyle):** uygulama kapalıyken açılış (kilitli ekranda da); uygulama
+açıkken 53 MB dosya (kilit açılınca tamamlandı); kirli belgede "kaydedilsin mi?" sorusu, İptal belgeyi tutuyor,
+Kaydetme yenisini açıyor; temiz belgede doğrudan yerine geçiyor; Geri, Android 15'in öngörülü geri hareketiyle de geliyor;
+kaydedilen dosyalar MediaStore'da (Dosyalar uygulamasında) görünüyor.
+
+**Açık kalanlar:**
+- Gerçek uygulamalarla elle: Google Files, WhatsApp, Gmail eki, Chrome indirmesi, Drive (yavaş bulut kaynağı, iptal yok).
+- Süreç ölümü sonrası Son kullanılanlar'dan dönüş ve ekran döndürme elle denenmeli.
+- WhatsApp'tan paylaşınca Geri kullanıcıyı WhatsApp'a değil ana ekrana götürür (singleTask; kabul edildi).
+- Paylaşılan dosya kaydedilince orijinal değişmez, `Belgeler/kobiPDF/<ad>.pdf` kopyası yazılır (bildirim konumu söylüyor).
 
 ## Adım 4 - Yazı tipleri (masaüstünü de etkiler, ayrı karar)
 - Liberation Sans / Serif / Mono (SIL OFL) gömülür; yalnız sistemde Arial / Times / Courier YOKSA kullanılır.

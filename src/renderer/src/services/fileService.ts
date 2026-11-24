@@ -113,7 +113,40 @@ export async function newDocument(): Promise<void> {
 }
 
 export async function openFromPath(path: string): Promise<void> {
+  // Android: "path" only signals that another app handed over a PDF; it waits in the incoming queue.
+  if (__ANDROID__) return openIncoming()
   await loadOpenedFile(await window.api.readFile(path))
+}
+
+let incomingChain: Promise<void> = Promise.resolve()
+
+/**
+ * Android: opens the newest PDF from another app. Runs one at a time; a file that arrives during a save
+ * waits for it. The file is copied and checked first, so the "save changes?" question is only asked
+ * for a file that will really open; then it replaces the open document (one document on a phone).
+ */
+function openIncoming(): Promise<void> {
+  incomingChain = incomingChain.then(openIncomingNow).catch((err) => console.error(err))
+  return incomingChain
+}
+
+async function openIncomingNow(): Promise<void> {
+  const api = window.api
+  if (!api.takeIncomingFile || !api.readIncomingFile) return
+  while (isBusy()) await new Promise((resolve) => window.setTimeout(resolve, 300))
+  const item = await api.takeIncomingFile()
+  if (!item) return
+  const read = api.readIncomingFile
+  const result = await runBusy('common.loading', () => read(item.id, item.name))
+  if (!result.ok) {
+    reportFailure(result)
+    return
+  }
+  const previous = store().activeDocumentId
+  if (previous && !(await confirmUnsaved())) return
+  await loadOpenedFile(result)
+  const current = store().activeDocumentId
+  if (previous && current !== previous) await discardParked(previous)
 }
 
 async function exportOrReport(): Promise<Uint8Array | null> {

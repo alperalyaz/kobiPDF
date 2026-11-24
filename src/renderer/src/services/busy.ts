@@ -9,6 +9,8 @@ export function isBusy(): boolean {
 
 /** Lets the browser paint before heavy synchronous work (pdf-lib blocks the main thread). */
 function nextPaint(): Promise<void> {
+  // A hidden page (screen off, app in the background) gets no animation frames: do not wait for one.
+  if (document.visibilityState === 'hidden') return new Promise((resolve) => window.setTimeout(resolve, 0))
   return new Promise((resolve) => requestAnimationFrame(() => window.setTimeout(resolve, 0)))
 }
 

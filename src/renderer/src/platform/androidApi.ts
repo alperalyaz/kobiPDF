@@ -4,7 +4,7 @@
 // Save falls back to Save As, which writes a copy to Documents/kobiPDF. Later saves overwrite that copy only.
 // Sharing is a separate action (shareFile), never a side effect of saving.
 import { App } from '@capacitor/app'
-import { Capacitor } from '@capacitor/core'
+import { Capacitor, registerPlugin, type PluginListenerHandle } from '@capacitor/core'
 import { Directory, Filesystem } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
 import type { FileErrorCode, KobiPdfApi, OpenedFile, OpenedImage, Result, SavedFile } from '../../../shared/ipc'
@@ -165,6 +165,44 @@ async function overwrite(path: string, data: Uint8Array): Promise<Result<SavedFi
   }
 }
 
+// ---------- files from other apps ("Open with", "Share") ----------
+
+interface IncomingFilePluginApi {
+  takePending(): Promise<{ id?: string; name?: string }>
+  copy(options: { id: string }): Promise<{ path: string }>
+  discard(options: { id: string }): Promise<void>
+  addListener(event: 'fileAvailable', listener: () => void): Promise<PluginListenerHandle>
+}
+
+/** Native side: android/app/src/main/java/com/hidroteknik/kobipdf/IncomingFilePlugin.java. */
+const IncomingFile = registerPlugin<IncomingFilePluginApi>('IncomingFile')
+
+/** Value handed to onOpenExternalFile / getPendingFile: "look at the incoming queue". */
+const INCOMING = 'incoming'
+const externalListeners = new Set<(path: string) => void>()
+
+// Registered once at module level (not in a React effect), so StrictMode or remounts cannot lose a signal.
+void IncomingFile.addListener('fileAvailable', () => externalListeners.forEach((cb) => cb(INCOMING)))
+
+function errorCode(err: unknown): FileErrorCode {
+  const code = (err as { code?: string } | null)?.code
+  return code === 'CORRUPT' || code === 'EACCES' || code === 'ENOENT' ? code : 'UNKNOWN'
+}
+
+async function readIncoming(id: string, name: string): Promise<Result<OpenedFile>> {
+  try {
+    const { path } = await IncomingFile.copy({ id })
+    // The local web server streams the cached copy: no base64 over the bridge, even for large files.
+    const response = await fetch(Capacitor.convertFileSrc(`file://${path}`))
+    if (!response.ok) return fail('UNKNOWN', `HTTP ${response.status}`)
+    return { ok: true, value: { path: null, name: pdfName(name), data: new Uint8Array(await response.arrayBuffer()) } }
+  } catch (err) {
+    return fail(errorCode(err), err)
+  } finally {
+    await IncomingFile.discard({ id }).catch(() => undefined)
+  }
+}
+
 // ---------- back button ----------
 
 let dirty = false
@@ -235,7 +273,8 @@ const androidApi: KobiPdfApi = {
   listSystemFonts: async () => [],
   readSystemFont: async () => null,
 
-  getPendingFile: async () => null,
+  // At start-up a file may already wait (the app was opened with it): always have the queue checked.
+  getPendingFile: async () => INCOMING,
   getDefaultPdfStatus: async () => 'unsupported',
   openDefaultAppsSettings: async () => undefined,
 
@@ -250,7 +289,16 @@ const androidApi: KobiPdfApi = {
     closeListeners.add(callback)
     return () => closeListeners.delete(callback)
   },
-  onOpenExternalFile: () => () => undefined,
+  onOpenExternalFile: (callback) => {
+    externalListeners.add(callback)
+    return () => externalListeners.delete(callback)
+  },
+
+  takeIncomingFile: async () => {
+    const { id, name } = await IncomingFile.takePending()
+    return id ? { id, name: name ?? '' } : null
+  },
+  readIncomingFile: readIncoming,
 
   shareFile: async (path) => {
     try {

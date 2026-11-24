@@ -109,4 +109,11 @@ export interface KobiPdfApi {
   onOpenExternalFile: (callback: (path: string) => void) => () => void
   /** Opens the system share sheet for a saved file. Android only. */
   shareFile?: (path: string) => Promise<void>
+  /**
+   * Android: the newest PDF another app handed over ("Open with", "Share"), taken off the queue; null when
+   * none waits. onOpenExternalFile only signals that one arrived.
+   */
+  takeIncomingFile?: () => Promise<{ id: string; name: string } | null>
+  /** Android: reads a file from takeIncomingFile (copied and checked to be a PDF natively), then forgets it. */
+  readIncomingFile?: (id: string, name: string) => Promise<Result<OpenedFile>>
 }
