@@ -49,7 +49,8 @@ export interface TextObject extends BoxBase {
   text: string
   style: TextStyle
   /** Area painted over before drawing, used when replacing existing page text. */
-  cover?: Rect & { color: string }
+  /** `vertical`: the original run ran up or down the page (rotated 90° or 270°). */
+  cover?: Rect & { color: string; vertical?: boolean }
 }
 
 export interface CommentObject extends BoxBase {

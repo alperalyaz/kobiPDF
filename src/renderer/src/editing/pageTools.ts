@@ -3,9 +3,9 @@ import { useEditStore } from '../store/useEditStore'
 import { commitDraft, nextDraftToken } from './draft'
 import { measureText, usableFont } from './fonts'
 import { fontAt } from './pdfFonts'
-import { boundsOfPoints, clientToPage, rgbToHex } from './geometry'
+import { boundsOfPoints, clientToPage, rgbToHex, rotateVector } from './geometry'
 import { changeObjects } from './history'
-import { newId, type FontFamily, type MarkupObject, type MarkupType, type Rect } from './types'
+import { newId, type FontFamily, type MarkupObject, type MarkupType, type Rect, type TextStyle } from './types'
 
 export const MARKUP_TOOLS: Partial<Record<ToolId, MarkupType>> = {
   underline: 'underline',
@@ -279,16 +279,31 @@ export function editPageText(span: HTMLElement, pageIndex: number): void {
     const { ascent, descent } = fontMetrics(font)
     return baseline - ((lineH - (ascent + descent) * fontSize) / 2 + ascent * fontSize)
   }
+  // Vertical or slanted runs keep their angle; the box then hangs off the run's start point.
+  const angle = Number(span.dataset.pdfAngle) || 0
+  const rotated = angle !== 0 && Number.isFinite(baseline) && Number.isFinite(pdfX)
+  const runLength = Number(span.dataset.pdfWidth) || 0
+  const placement = (
+    font: FontFamily,
+    textStyle: TextStyle,
+    value: string
+  ): { x: number; y: number; width: number } => {
+    const width = Math.max(rotated ? runLength : rect.width, measureText(value, textStyle)) + fontSize * 0.5
+    if (!rotated) return { x: rect.x, y: topFor(font), width }
+    // Where the start of the baseline sits relative to the box center, before rotating.
+    const toStart = rotateVector({ x: -width / 2, y: baseline - topFor(font) - lineH / 2 }, angle)
+    const centerX = pdfX - toStart.x
+    const centerY = baseline - toStart.y
+    return { x: centerX - width / 2, y: centerY - lineH / 2, width }
+  }
   const token = nextDraftToken()
   useEditStore.getState().select(null)
   useEditStore.getState().setDraft({
     kind: 'text',
     id: null,
     pageIndex,
-    x: rect.x,
-    y: topFor(style.font),
-    width: Math.max(rect.width, measureText(text, style)) + fontSize * 0.5,
-    rotation: 0,
+    ...placement(style.font, style, text),
+    rotation: angle,
     text,
     originalText: text,
     style,
@@ -299,7 +314,8 @@ export function editPageText(span: HTMLElement, pageIndex: number): void {
       y: rect.y - 1,
       width: rect.width + 2,
       height: rect.height + 2,
-      color: canvas ? backgroundAround(canvas, clientRect) : '#ffffff'
+      color: canvas ? backgroundAround(canvas, clientRect) : '#ffffff',
+      vertical: angle === 90 || angle === 270
     },
     token
   })
@@ -317,10 +333,6 @@ export function editPageText(span: HTMLElement, pageIndex: number): void {
       bold: runFont.bold || Boolean(match?.bold),
       italic: runFont.italic || Boolean(match?.italic)
     }
-    useEditStore.getState().updateDraft({
-      style: next,
-      y: topFor(font),
-      width: Math.max(rect.width, measureText(draft.text, next)) + fontSize * 0.5
-    })
+    useEditStore.getState().updateDraft({ style: next, ...placement(font, next, draft.text) })
   })
 }

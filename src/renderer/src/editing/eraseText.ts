@@ -5,6 +5,8 @@ export interface TextErase {
   pageIndex: number
   /** Page-frame rect (top-left origin, y down) of the original text run. */
   rect: Rect
+  /** The run ran up or down the page, so its line thickness is the rect's width. */
+  vertical?: boolean
 }
 
 // Constants from MuPDF's pdf_redact_options.
@@ -29,23 +31,25 @@ export async function eraseText(
     // Loaded on first use: the WebAssembly module is large.
     const mupdf = await import('mupdf')
     doc = mupdf.Document.openDocument(bytes, 'application/pdf') as import('mupdf').PDFDocument
-    const byPage = new Map<number, Rect[]>()
-    for (const e of erases) byPage.set(e.pageIndex, [...(byPage.get(e.pageIndex) ?? []), e.rect])
+    const byPage = new Map<number, TextErase[]>()
+    for (const e of erases) byPage.set(e.pageIndex, [...(byPage.get(e.pageIndex) ?? []), e])
 
-    for (const [pageIndex, rects] of byPage) {
+    for (const [pageIndex, pageErases] of byPage) {
       const info = pageSizes[pageIndex]
       if (!info) continue
       const page = doc.loadPage(pageIndex)
       const toPage = page.getTransform()
       const [vx0, , , vy1] = info.viewBox
-      for (const r of rects) {
-        // Trim the top and bottom so tightly spaced neighbour lines stay intact.
-        const inset = r.height * 0.2
+      for (const { rect: r, vertical } of pageErases) {
+        // Trim across the line (top and bottom, or both sides for vertical text)
+        // so tightly spaced neighbour lines stay intact.
+        const insetX = vertical ? r.width * 0.2 : 0
+        const insetY = vertical ? 0 : r.height * 0.2
         const user: [number, number, number, number] = [
-          vx0 + r.x,
-          vy1 - (r.y + r.height - inset),
-          vx0 + r.x + r.width,
-          vy1 - (r.y + inset)
+          vx0 + r.x + insetX,
+          vy1 - (r.y + r.height - insetY),
+          vx0 + r.x + r.width - insetX,
+          vy1 - (r.y + insetY)
         ]
         const annot = page.createAnnotation('Redact')
         annot.setRect(mupdf.Rect.transform(user, toPage))

@@ -233,7 +233,9 @@ export async function exportEdits(
 ): Promise<Uint8Array> {
   if (objects.length === 0) return bytes
   const erases = objects.flatMap((o) =>
-    o.kind === 'text' && o.cover ? [{ pageIndex: o.pageIndex, rect: o.cover }] : []
+    o.kind === 'text' && o.cover
+      ? [{ pageIndex: o.pageIndex, rect: o.cover, vertical: o.cover.vertical === true }]
+      : []
   )
   const erased = await eraseText(bytes, erases, pageSizes)
   const doc = await PDFDocument.load(erased ?? bytes)

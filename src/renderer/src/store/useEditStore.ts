@@ -20,7 +20,7 @@ export interface TextDraft {
   style: TextStyle
   fill: string
   border: string
-  cover?: Rect & { color: string }
+  cover?: Rect & { color: string; vertical?: boolean }
   /** For "edit existing text": unchanged text is discarded instead of committed. */
   originalText?: string
   /** Changes only when a new box is opened, not when that box is moved. */

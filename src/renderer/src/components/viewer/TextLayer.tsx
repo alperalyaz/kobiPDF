@@ -78,9 +78,13 @@ function annotateSpans(layer: PdfTextLayer, items: unknown[], page: PDFPageProxy
   const [, , , viewTop] = page.view
   textItems.forEach((item, i) => {
     const div = divs[i]
-    const [, , c, d, , f] = item.transform
+    const [a, b, c, d, , f] = item.transform
     div.dataset.pdfX = String(item.transform[4] - page.view[0])
     div.dataset.pdfSize = String(Math.hypot(c, d))
     div.dataset.pdfBaseline = String(viewTop - f)
+    // Writing direction as a clockwise angle in the page frame (y down): bottom-to-top text is 270.
+    const angle = Math.round((Math.atan2(-b, a) * 180) / Math.PI)
+    div.dataset.pdfAngle = String((angle + 360) % 360)
+    div.dataset.pdfWidth = String(item.width)
   })
 }
