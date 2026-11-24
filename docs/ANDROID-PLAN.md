@@ -204,6 +204,16 @@ Sipariş sonrası: paneldeki adresleri kapalı test e-posta listesine ekle, test
 **Açık kalanlar:** PrimeTestLab ödemesi (kullanıcı); testçi listesinin eklenmesi; 14 gün sonra üretim başvurusu; Play'den
 kurulan imzalı sürümün telefonda denenmesi (dahili test bağlantısı); İngilizce sayfaya İngilizce ekran görüntüleri.
 
+**Play'de olmayan, main'de bekleyen değişiklikler (0.5.0 / 50000'den sonra):**
+- Hakkında penceresi telefona uyarlandı (sekmeler üstte, telefona özel Nasıl kullanılır / SSS metinleri).
+- Varsayılan PDF uygulaması yardımı (`DefaultPdfPlugin`, `DefaultPdfCard`): karşılama ekranında kart, Hakkında > Genel'de
+  satır. Android kendini varsayılan yapmaya izin vermez; kart sistemin "Birlikte aç" listesini (kobiPDF + Her zaman) ya da
+  başka uygulama seçilmişse onun ayarlarını ("Varsayılanları temizle") açar. Telefonda durum algılama ve "seçildi"
+  sinyali denendi; gerçek "Her zaman" dokunuşu henüz denenmedi.
+
+Karar (2026-11-24): kapalı test incelemesi bitmeden yeni AAB yüklenmeyecek (inceleme baştan başlayabilir); başka
+değişiklikler de birikince tek sürüm olarak yüklenecek (ANDROID_BUILD=1 → versionCode 50001, ya da yeni sürüm numarası).
+
 ## Çalışma düzeni
 Telefonda deneme gereken her adım (0, 2, 3, 5) yerel oturumda, USB bağlı telefonla yapılır.
 Her adım kendi `bekleyen/<konu>` dalında. Masaüstüne dokunan değişiklik (Adım 1, 2, 4) yayından önce Windows'ta elle denenir.
