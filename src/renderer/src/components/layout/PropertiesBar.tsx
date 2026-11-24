@@ -132,7 +132,7 @@ export function PropertiesBar(): JSX.Element | null {
   if (empty) return null
 
   return (
-    <div className="flex h-8 shrink-0 items-center gap-2 overflow-x-auto border-b border-chrome-border bg-chrome px-2">
+    <div className="flex h-8 shrink-0 items-center gap-2 overflow-x-auto overflow-y-hidden border-b border-chrome-border bg-chrome px-2">
       {showText && textStyle && (
         <>
           <select
