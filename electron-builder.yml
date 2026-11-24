@@ -30,6 +30,8 @@ win:
   target:
     - target: nsis
       arch: [x64]
+    - target: appx
+      arch: [x64]
 
 nsis:
   oneClick: false
@@ -42,6 +44,20 @@ nsis:
   uninstallerIcon: build/icon.ico
   installerHeaderIcon: build/icon.ico
   artifactName: ${productName}-Setup-${version}.${ext}
+
+# Microsoft Store package (MSIX). Identity values come from Partner Center >
+# kobiPDF > Product identity. The Store signs the package on submission.
+appx:
+  identityName: Hidroteknik.kobiPDF
+  publisher: CN=119D3611-306D-4F5E-B28C-3904B4C07374
+  publisherDisplayName: Hidroteknik
+  displayName: kobiPDF
+  applicationId: kobiPDF
+  backgroundColor: transparent
+  languages:
+    - tr-TR
+    - en-US
+  artifactName: ${productName}-${version}-Store.${ext}
 
 mac:
   # electron-builder generates icon.icns from the 1024px PNG.

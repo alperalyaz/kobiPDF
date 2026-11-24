@@ -31,7 +31,20 @@ async function main() {
 
   await sharp(master).resize(256, 256).png().toFile(resolve(rendererAssets, 'logo.png'))
 
-  console.log('Icons generated: build/icon.png, build/icon.ico, src/renderer/src/assets/logo.png')
+  // Microsoft Store (MSIX) tiles, picked up by electron-builder from build/appx.
+  const appxDir = resolve(buildDir, 'appx')
+  await mkdir(appxDir, { recursive: true })
+  const square = { StoreLogo: 50, Square44x44Logo: 44, SmallTile: 71, Square150x150Logo: 150, LargeTile: 310 }
+  for (const [name, size] of Object.entries(square)) {
+    await sharp(master).resize(size, size).png().toFile(resolve(appxDir, `${name}.png`))
+  }
+  const wideMark = await sharp(master).resize(130, 130).png().toBuffer()
+  await sharp({ create: { width: 310, height: 150, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+    .composite([{ input: wideMark, left: 90, top: 10 }])
+    .png()
+    .toFile(resolve(appxDir, 'Wide310x150Logo.png'))
+
+  console.log('Icons generated: build/icon.png, build/icon.ico, build/appx/*.png, src/renderer/src/assets/logo.png')
 }
 
 main().catch((err) => {

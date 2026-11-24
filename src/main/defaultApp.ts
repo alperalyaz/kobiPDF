@@ -3,6 +3,9 @@ import { basename } from 'node:path'
 import { app, ipcMain, shell } from 'electron'
 import { IpcChannels, type DefaultPdfStatus } from '../shared/ipc'
 
+/** Package identity name from Partner Center (electron-builder.yml, appx.identityName). */
+const STORE_IDENTITY = 'Hidroteknik.kobiPDF'
+
 function regQuery(args: string[]): Promise<string | null> {
   return new Promise((resolve) => {
     execFile('reg', ['query', ...args], { windowsHide: true, timeout: 5000 }, (err, stdout) =>
@@ -30,6 +33,9 @@ async function defaultPdfStatus(): Promise<DefaultPdfStatus> {
   )
   const progId = choice ?? regValue(await regQuery(['HKCR\\.pdf', '/ve']))
   if (!progId) return 'notDefault'
+  // Store (MSIX) installs register an AppX ProgId with no command line; it names the app by its AppUserModelID.
+  const appModelId = regValue(await regQuery([`HKCR\\${progId}\\Application`, '/v', 'AppUserModelID']))
+  if (appModelId) return appModelId.startsWith(`${STORE_IDENTITY}_`) ? 'default' : 'notDefault'
   const command = regValue(await regQuery([`HKCR\\${progId}\\shell\\open\\command`, '/ve']))
   if (!command) return 'notDefault'
   const exe = basename(process.execPath).toLowerCase()
