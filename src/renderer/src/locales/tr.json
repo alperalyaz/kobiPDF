@@ -7,6 +7,92 @@
     "developer": "Geliştirici",
     "rights": "© {{year}} Hidroteknik. AGPL-3.0 lisansıyla özgür yazılımdır."
   },
+  "about": {
+    "version": "Sürüm {{version}}",
+    "tabs": {
+      "general": "Genel",
+      "howto": "Nasıl kullanılır",
+      "shortcuts": "Klavye kısayolları",
+      "faq": "Sık sorulan sorular",
+      "company": "Hidroteknik ve lisans"
+    },
+    "links": {
+      "repo": "Kaynak kodu (GitHub)",
+      "issues": "Hata bildir veya öneride bulun",
+      "issuesDetail": "GitHub Issues sayfası açılır",
+      "website": "Hidroteknik web sitesi"
+    },
+    "howto": {
+      "open": {
+        "title": "PDF açın",
+        "body": "Dosya sekmesindeki Aç düğmesine basın veya Ctrl+O kullanın. Birden fazla PDF açarsanız her biri ayrı bir sekmede açılır. kobiPDF'i varsayılan PDF programı yaptıysanız PDF dosyasına çift tıklamanız yeterlidir."
+      },
+      "navigate": {
+        "title": "Belgede gezinin",
+        "body": "Soldaki küçük resimlere veya yer imlerine tıklayın. Alttaki çubuktan sayfa numarası yazabilir, kaydırıcıyla ya da Ctrl + fare tekerleğiyle yakınlaştırabilirsiniz. El aracıyla (H) sayfayı sürükleyerek kaydırırsınız."
+      },
+      "text": {
+        "title": "Metin ekleyin veya düzeltin",
+        "body": "Metin Ekle (T) ile sayfada istediğiniz yere yazı yazın. Metni Düzenle (E) ile belgede var olan yazıya tıklayıp değiştirin; yazı tipi, punto ve renk üstteki özellik çubuğundan ayarlanır."
+      },
+      "markup": {
+        "title": "İşaretleyin ve not alın",
+        "body": "Yorum sekmesinde vurgulama, altını çizme, üstünü çizme, kalem, silgi, yapışkan not ve yorum kutusu bulunur."
+      },
+      "signature": {
+        "title": "İmza veya kaşe koyun",
+        "body": "İmza / Kaşe penceresinde imzanızı fareyle çizin ya da resim olarak yükleyin. Yerleştirdiğiniz imzalar bir sonraki sefer için listede saklanır."
+      },
+      "pages": {
+        "title": "Sayfaları düzenleyin",
+        "body": "Sayfalar sekmesinden sayfa döndürme, silme, çıkarma ve sıralama yapabilir, PDF birleştirip bölebilirsiniz. Sıralamak için küçük resimleri sürüklemeniz yeterlidir."
+      },
+      "save": {
+        "title": "Kaydedin veya yazdırın",
+        "body": "Ctrl+S ile kaydedin, Ctrl+Shift+S ile yeni bir dosya olarak kaydedin. Ctrl+P yazdırma önizlemesini açar. Yaptığınız her şeyi Ctrl+Z ile geri alabilirsiniz."
+      }
+    },
+    "shortcuts": {
+      "wheelZoom": "Yakınlaştır / uzaklaştır",
+      "wheel": "fare tekerleği"
+    },
+    "faq": {
+      "free": {
+        "q": "kobiPDF gerçekten ücretsiz mi?",
+        "a": "Evet. Lisans ücreti, abonelik ya da reklam yoktur. Kaynak kodu GitHub'da herkese açıktır."
+      },
+      "offline": {
+        "q": "İnternet gerekiyor mu? Belgelerim bir yere gönderiliyor mu?",
+        "a": "Hayır. kobiPDF tamamen bilgisayarınızda çalışır; belgeleriniz hiçbir sunucuya yüklenmez. İnternet yalnızca Hakkında penceresindeki bağlantıları açtığınızda kullanılır."
+      },
+      "default": {
+        "q": "PDF dosyalarını çift tıklayınca kobiPDF'te nasıl açarım?",
+        "a": "Bir PDF dosyasına sağ tıklayın, Birlikte aç > Başka bir uygulama seç'e gidin, kobiPDF'i seçin ve \"Her zaman bu uygulamayı kullan\" kutusunu işaretleyin. Windows, programların kendini sormadan varsayılan yapmasına izin vermez."
+      },
+      "scanned": {
+        "q": "Taranmış bir sayfadaki yazıyı neden düzenleyemiyorum?",
+        "a": "Taranmış sayfalar yazı değil resimdir, bu yüzden Metni Düzenle aracı onlarda çalışmaz. Bu sayfalara Metin Ekle ile yeni yazı ekleyebilirsiniz."
+      },
+      "encrypted": {
+        "q": "Parolalı veya şifreli PDF'ler açılıyor mu?",
+        "a": "Henüz hayır. Parola korumalı ve şifreli belgeler şu an desteklenmiyor."
+      },
+      "undo": {
+        "q": "Yanlışlıkla bir şeyi değiştirdim, geri alabilir miyim?",
+        "a": "Evet. Ctrl+Z geri alır, Ctrl+Y yineler. Kaydedilmemiş değişiklikler varken bir belgeyi kapatırsanız kobiPDF size sorar."
+      },
+      "bug": {
+        "q": "Bir hata buldum veya bir önerim var. Nereye yazayım?",
+        "a": "Genel sekmesindeki \"Hata bildir veya öneride bulun\" bağlantısıyla GitHub'da yeni bir kayıt açabilirsiniz."
+      }
+    },
+    "company": {
+      "body": "Hidroteknik, kobiPDF'i geliştiren ve KOBİ'lerin günlük işlerinde ihtiyaç duyduğu PDF araçlarını ücretsiz sunmak için yayımlayan şirkettir.",
+      "licenseTitle": "Lisans",
+      "license": "kobiPDF, GNU Affero Genel Kamu Lisansı sürüm 3 (AGPL-3.0) ile dağıtılan özgür yazılımdır. Programı kullanabilir, inceleyebilir, değiştirebilir ve aynı lisansla paylaşabilirsiniz.",
+      "thirdParty": "Kullanılan açık kaynak bileşenler"
+    }
+  },
   "common": {
     "language": "Dil",
     "noDocument": "Açık belge yok",
@@ -49,6 +135,7 @@
     }
   },
   "tools": {
+    "newDocument": "Yeni",
     "open": "Aç",
     "save": "Kaydet",
     "saveAs": "Farklı Kaydet",
@@ -117,6 +204,20 @@
     "notePlaceholder": "Not yazın..."
   },
   "dialogs": {
+    "newDocument": {
+      "title": "Yeni PDF",
+      "hint": "Boş sayfanın boyutunu seçin. Belge tek bir beyaz sayfayla açılır; metin, resim ve imza ekleyip kaydedebilirsiniz.",
+      "a4Portrait": "A4 dikey",
+      "a4Landscape": "A4 yatay",
+      "a5Portrait": "A5 dikey",
+      "a5Landscape": "A5 yatay",
+      "custom": "Özel ölçü",
+      "customDetail": "En × boy",
+      "width": "En",
+      "height": "Boy",
+      "invalid": "En ve boy {{min}} ile {{max}} mm arasında olmalıdır.",
+      "create": "Oluştur"
+    },
     "unsaved": {
       "title": "Kaydedilmemiş değişiklikler",
       "message": "{{name}} belgesinde kaydedilmemiş değişiklikler var. Kaydetmek ister misiniz?",
@@ -125,6 +226,7 @@
     "deletePages": {
       "title": "Sayfaları sil",
       "message": "{{pages}} numaralı sayfalar silinecek. Bu işlem geri alınabilir.",
+      "allMessage": "Belgedeki bütün sayfalar silinecek ve yerine tek bir boş sayfa kalacak. Bu işlem geri alınabilir.",
       "confirm": "Sil"
     },
     "extract": {
@@ -190,7 +292,6 @@
     "printFailed": "Yazdırma başarısız oldu.",
     "ENCRYPTED": "Bu PDF şifreli. Şifreli belgeler düzenlenemez.",
     "editFailed": "Belge değiştirilemedi.",
-    "deleteAllPages": "Belgedeki bütün sayfalar silinemez.",
     "noText": "Bu sayfada düzenlenebilir metin yok. Taranmış sayfalarda Metin Ekle kullanın."
   },
   "messages": {

@@ -15,6 +15,12 @@ export interface SignatureResult {
   height: number
 }
 
+/** Page size in PDF points (1/72 inch). */
+export interface PageSizeResult {
+  width: number
+  height: number
+}
+
 export type DialogSpec =
   | {
       type: 'confirm'
@@ -28,6 +34,7 @@ export type DialogSpec =
   | { type: 'pageRange'; titleKey: string; confirmKey: string; initial: string; pageCount: number }
   | { type: 'split'; pageCount: number }
   | { type: 'signature' }
+  | { type: 'newDocument' }
   | {
       type: 'print'
       pageCount: number
@@ -48,7 +55,9 @@ export type DialogResult<S extends DialogSpec> = S extends { type: 'confirm' }
           ? SignatureResult | null
           : S extends { type: 'print' }
             ? PrintDialogResult | null
-            : never
+            : S extends { type: 'newDocument' }
+              ? PageSizeResult | null
+              : never
 
 interface DialogState {
   current: { id: number; spec: DialogSpec; resolve: (value: unknown) => void } | null

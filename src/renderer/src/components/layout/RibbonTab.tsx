@@ -13,10 +13,10 @@ export function RibbonTab({ tab, selected, onSelect }: RibbonTabProps): JSX.Elem
 
   const tone = isFile
     ? selected
-      ? 'bg-brand-dark text-white'
-      : 'bg-brand text-white hover:bg-brand-dark'
+      ? 'bg-accent-dark text-white'
+      : 'bg-accent text-white hover:bg-accent-dark'
     : selected
-      ? 'border-chrome-border border-b-chrome bg-chrome font-semibold text-brand'
+      ? 'border-chrome-border border-b-chrome bg-chrome font-semibold text-brand shadow-[inset_0_2px_0_var(--color-accent)]'
       : 'border-transparent text-ink hover:bg-chrome/70'
 
   return (

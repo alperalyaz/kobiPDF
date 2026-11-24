@@ -70,7 +70,7 @@ export function DialogButton({
     variant === 'primary'
       ? 'border-brand bg-brand text-white hover:bg-brand-dark'
       : variant === 'danger'
-        ? 'border-brand bg-white text-brand hover:bg-brand-soft'
+        ? 'border-accent bg-white text-accent hover:bg-accent-soft'
         : 'border-chrome-border bg-white text-ink hover:bg-chrome'
   return (
     <button

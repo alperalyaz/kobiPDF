@@ -30,7 +30,9 @@ export function TitleBar(): JSX.Element {
       >
         <img src={logo} alt="" className="h-6 w-6" draggable={false} />
       </button>
-      <span className="text-[13px] font-bold tracking-tight text-brand">{t('app.name')}</span>
+      <span className="text-[13px] font-bold tracking-tight text-brand" aria-label={t('app.name')}>
+        kobi<span className="text-accent">PDF</span>
+      </span>
       <span className="mx-1 h-4 w-px bg-chrome-border" />
       <QuickAccessBar />
       <div className="min-w-0 flex-1 truncate text-center text-[12px] text-ink-muted">

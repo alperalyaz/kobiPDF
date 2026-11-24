@@ -1,7 +1,7 @@
 import { FolderOpen } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { runAction } from '../../actions/actions'
-import logo from '../../assets/logo.png'
+import logoFull from '../../assets/logo-full.svg'
 import { formatShortcut } from '../common/ActionButton'
 
 export function EmptyState(): JSX.Element {
@@ -10,8 +10,9 @@ export function EmptyState(): JSX.Element {
   return (
     <div className="flex h-full items-center justify-center">
       <div className="flex w-[340px] flex-col items-center rounded-lg border border-chrome-border bg-white px-8 py-10 text-center shadow-sm">
-        <img src={logo} alt={t('app.name')} className="h-24 w-24" draggable={false} />
-        <h1 className="mt-4 text-[20px] font-semibold text-ink">{t('app.name')}</h1>
+        <h1>
+          <img src={logoFull} alt={t('app.name')} className="h-40 w-auto" draggable={false} />
+        </h1>
         <p className="mt-2 text-[13px] leading-relaxed text-ink">{t('app.tagline')}</p>
         <p className="mt-3 text-[12px] text-ink-muted">{t('common.openHint')}</p>
         <button

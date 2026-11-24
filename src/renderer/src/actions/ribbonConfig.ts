@@ -20,7 +20,7 @@ export const ribbonTabs: RibbonTabConfig[] = [
     id: 'file',
     labelKey: 'ribbon.tabs.file',
     groups: [
-      { id: 'document', labelKey: 'ribbon.groups.document', large: ['open', 'save', 'saveAs', 'close'] },
+      { id: 'document', labelKey: 'ribbon.groups.document', large: ['newDocument', 'open', 'save', 'saveAs', 'close'] },
       { id: 'output', labelKey: 'ribbon.groups.output', large: ['print'] }
     ]
   },

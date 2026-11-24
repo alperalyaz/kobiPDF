@@ -1,9 +1,13 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-brand: #135ca9;
-  --color-brand-dark: #0e4783;
-  --color-brand-soft: #e7f0fa;
+  /* Logo navy: main UI color. Logo red: accent (file tab, wordmark, destructive buttons). */
+  --color-brand: #1f2b45;
+  --color-brand-dark: #141c30;
+  --color-brand-soft: #e8ebf2;
+  --color-accent: #d7141a;
+  --color-accent-dark: #b00f14;
+  --color-accent-soft: #fdeaea;
   --color-chrome: #f3f3f5;
   --color-chrome-border: #d9dadf;
   --color-workspace: #e4e5ea;

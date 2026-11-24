@@ -7,6 +7,92 @@
     "developer": "Developer",
     "rights": "© {{year}} Hidroteknik. Free software under the AGPL-3.0 license."
   },
+  "about": {
+    "version": "Version {{version}}",
+    "tabs": {
+      "general": "General",
+      "howto": "How to use",
+      "shortcuts": "Keyboard shortcuts",
+      "faq": "FAQ",
+      "company": "Hidroteknik & license"
+    },
+    "links": {
+      "repo": "Source code (GitHub)",
+      "issues": "Report a bug or suggest a feature",
+      "issuesDetail": "Opens the GitHub Issues page",
+      "website": "Hidroteknik website"
+    },
+    "howto": {
+      "open": {
+        "title": "Open a PDF",
+        "body": "Click Open on the File tab or press Ctrl+O. Each PDF you open gets its own tab. If kobiPDF is your default PDF app, just double-click a PDF file."
+      },
+      "navigate": {
+        "title": "Move around the document",
+        "body": "Click the thumbnails or bookmarks on the left. Type a page number in the bottom bar, and zoom with the slider or Ctrl + mouse wheel. The Hand tool (H) lets you drag the page."
+      },
+      "text": {
+        "title": "Add or fix text",
+        "body": "Add Text (T) writes anywhere on the page. Edit Text (E) lets you click existing text and change it; set the font, size and color in the property bar."
+      },
+      "markup": {
+        "title": "Mark up and take notes",
+        "body": "The Comment tab has highlight, underline, strikeout, pen, eraser, sticky note and comment box."
+      },
+      "signature": {
+        "title": "Add a signature or stamp",
+        "body": "In the Signature / Stamp window, draw your signature with the mouse or upload an image. Signatures you place are kept in the list for next time."
+      },
+      "pages": {
+        "title": "Organize pages",
+        "body": "The Pages tab rotates, deletes, extracts and reorders pages, and merges or splits PDFs. Drag thumbnails to reorder."
+      },
+      "save": {
+        "title": "Save or print",
+        "body": "Ctrl+S saves, Ctrl+Shift+S saves as a new file, and Ctrl+P opens the print preview. Ctrl+Z undoes any change."
+      }
+    },
+    "shortcuts": {
+      "wheelZoom": "Zoom in / out",
+      "wheel": "mouse wheel"
+    },
+    "faq": {
+      "free": {
+        "q": "Is kobiPDF really free?",
+        "a": "Yes. There are no license fees, subscriptions or ads, and the source code is public on GitHub."
+      },
+      "offline": {
+        "q": "Do I need the internet? Are my documents sent anywhere?",
+        "a": "No. kobiPDF runs entirely on your computer and never uploads your documents. The internet is only used when you open a link in this About window."
+      },
+      "default": {
+        "q": "How do I open PDFs in kobiPDF by double-clicking?",
+        "a": "Right-click a PDF, choose Open with > Choose another app, pick kobiPDF and tick \"Always use this app\". Windows doesn't let programs make themselves the default without asking."
+      },
+      "scanned": {
+        "q": "Why can't I edit the text on a scanned page?",
+        "a": "Scanned pages are images, not text, so Edit Text can't change them. You can still add new text with Add Text."
+      },
+      "encrypted": {
+        "q": "Can I open password-protected or encrypted PDFs?",
+        "a": "Not yet. Password-protected and encrypted documents aren't supported at the moment."
+      },
+      "undo": {
+        "q": "I changed something by mistake. Can I undo it?",
+        "a": "Yes. Ctrl+Z undoes and Ctrl+Y redoes. If you close a document with unsaved changes, kobiPDF asks first."
+      },
+      "bug": {
+        "q": "I found a bug or have an idea. Where do I report it?",
+        "a": "Use \"Report a bug or suggest a feature\" on the General tab to open a new issue on GitHub."
+      }
+    },
+    "company": {
+      "body": "Hidroteknik develops kobiPDF and releases it free of charge so small businesses have the PDF tools they need every day.",
+      "licenseTitle": "License",
+      "license": "kobiPDF is free software distributed under the GNU Affero General Public License version 3 (AGPL-3.0). You may use, study, modify and share it under the same license.",
+      "thirdParty": "Open-source components"
+    }
+  },
   "common": {
     "language": "Language",
     "noDocument": "No document open",
@@ -49,6 +135,7 @@
     }
   },
   "tools": {
+    "newDocument": "New",
     "open": "Open",
     "save": "Save",
     "saveAs": "Save As",
@@ -117,6 +204,20 @@
     "notePlaceholder": "Type a note..."
   },
   "dialogs": {
+    "newDocument": {
+      "title": "New PDF",
+      "hint": "Choose the size of the blank page. The document opens with one white page you can fill with text, images and signatures, then save.",
+      "a4Portrait": "A4 portrait",
+      "a4Landscape": "A4 landscape",
+      "a5Portrait": "A5 portrait",
+      "a5Landscape": "A5 landscape",
+      "custom": "Custom size",
+      "customDetail": "Width × height",
+      "width": "Width",
+      "height": "Height",
+      "invalid": "Width and height must be between {{min}} and {{max}} mm.",
+      "create": "Create"
+    },
     "unsaved": {
       "title": "Unsaved changes",
       "message": "{{name}} has unsaved changes. Do you want to save them?",
@@ -125,6 +226,7 @@
     "deletePages": {
       "title": "Delete pages",
       "message": "Pages {{pages}} will be deleted. This can be undone.",
+      "allMessage": "Every page will be deleted and one blank page will remain. This can be undone.",
       "confirm": "Delete"
     },
     "extract": {
@@ -190,7 +292,6 @@
     "printFailed": "Printing failed.",
     "ENCRYPTED": "This PDF is encrypted. Encrypted documents cannot be edited.",
     "editFailed": "The document could not be modified.",
-    "deleteAllPages": "A document must keep at least one page.",
     "noText": "This page has no editable text. Use Add Text on scanned pages."
   },
   "messages": {

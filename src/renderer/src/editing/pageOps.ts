@@ -40,28 +40,28 @@ export function deletePages(): Promise<void> {
     const doc = store().document!
     const pages = targetPages()
     const count = doc.pageSizes.length
-    if (pages.length >= count) {
-      store().showNotice({ kind: 'error', key: 'errors.deleteAllPages' })
-      return
-    }
+    // A PDF needs at least one page, so deleting every page leaves one blank page of the first page's size.
+    const all = pages.length >= count
     const confirmed = await openDialog({
       type: 'confirm',
       titleKey: 'dialogs.deletePages.title',
-      messageKey: 'dialogs.deletePages.message',
+      messageKey: all ? 'dialogs.deletePages.allMessage' : 'dialogs.deletePages.message',
       params: { pages: formatPageRanges(pages) },
       confirmKey: 'dialogs.deletePages.confirm',
       danger: true
     })
     if (!confirmed) return
     const pdf = await PDFDocument.load(doc.bytes)
+    const { width, height } = pdf.getPage(0).getSize()
     for (const pageNumber of [...pages].sort((a, b) => b - a)) pdf.removePage(pageNumber - 1)
+    if (all) pdf.addPage([width, height])
     const removed = new Set(pages.map((p) => p - 1))
     const shift = (index: number): number => index - [...removed].filter((r) => r < index).length
     await changeBytes(
       await pdf.save(),
       (objects) =>
         objects.filter((o) => !removed.has(o.pageIndex)).map((o) => ({ ...o, pageIndex: shift(o.pageIndex) })),
-      Math.min(count - pages.length, shift(Math.min(...pages) - 1) + 1)
+      all ? 1 : Math.min(count - pages.length, shift(Math.min(...pages) - 1) + 1)
     )
     useAppStore.setState({ selectedPages: [], selectionAnchor: null })
   })

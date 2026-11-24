@@ -26,7 +26,7 @@ export function DocumentTabs(): JSX.Element | null {
   })
 
   return (
-    <div className="flex h-8 shrink-0 items-end gap-0.5 overflow-x-auto border-b border-chrome-border bg-chrome px-2">
+    <div className="flex h-8 shrink-0 items-end gap-0.5 overflow-x-auto overflow-y-hidden [scrollbar-width:none] border-b border-chrome-border bg-chrome px-2">
       {tabs.map((tab) => {
         const active = tab.id === activeId
         return (

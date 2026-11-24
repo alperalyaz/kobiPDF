@@ -1,3 +1,4 @@
+import { PDFDocument } from 'pdf-lib'
 import type { OpenedFile, Result } from '../../../shared/ipc'
 import { openDialog } from '../components/dialogs/dialogStore'
 import { commitDraft } from '../editing/draft'
@@ -5,6 +6,7 @@ import { exportEdits } from '../editing/exportEdits'
 import { isDirty, markSaved } from '../editing/history'
 import { useAppStore } from '../store/useAppStore'
 import { useEditStore } from '../store/useEditStore'
+import i18n from '../locales/i18n'
 import { closeTab, openInTab } from './documentTabs'
 import { loadPdf, PdfLoadError } from './pdfService'
 import { mountPrintRoot, renderPrintPages } from './printService'
@@ -74,6 +76,25 @@ export async function confirmUnsaved(): Promise<boolean> {
 
 export async function openFromDialog(): Promise<void> {
   await loadOpenedFile(await window.api.openFile())
+}
+
+let untitledCount = 0
+
+/** Asks for a page size and opens a new document with one blank page in its own tab. */
+export async function newDocument(): Promise<void> {
+  const size = await openDialog({ type: 'newDocument' })
+  if (!size) return
+  const pdf = await PDFDocument.create()
+  pdf.addPage([size.width, size.height])
+  untitledCount += 1
+  const base = i18n.t('common.untitled')
+  const name = untitledCount === 1 ? `${base}.pdf` : `${base} ${untitledCount}.pdf`
+  store().setLoading(true)
+  try {
+    await showDocument({ path: null, name, data: await pdf.save() }, { unsaved: true })
+  } finally {
+    store().setLoading(false)
+  }
 }
 
 export async function openFromPath(path: string): Promise<void> {

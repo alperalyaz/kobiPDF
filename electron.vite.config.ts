@@ -3,6 +3,7 @@ import { defineConfig } from 'electron-vite'
 import type { Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import pkg from './package.json'
 
 /** Injects the Content-Security-Policy; dev additionally allows Vite's HMR client. */
 function contentSecurityPolicy(): Plugin {
@@ -37,6 +38,9 @@ export default defineConfig({
   main: {},
   preload: {},
   renderer: {
+    define: {
+      __APP_VERSION__: JSON.stringify(pkg.version)
+    },
     resolve: {
       alias: {
         '@renderer': resolve(__dirname, 'src/renderer/src')
