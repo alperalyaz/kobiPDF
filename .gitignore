@@ -7,3 +7,8 @@ src/renderer/public/pdfjs
 *.tsbuildinfo
 .DS_Store
 electron.exe
+
+# Android signing keys must never be committed
+*.jks
+*.keystore
+keystore.properties

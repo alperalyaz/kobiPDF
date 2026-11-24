@@ -30,6 +30,7 @@ import {
   Save,
   SaveAll,
   Scan,
+  Share2,
   Split,
   SquareDashedMousePointer,
   StickyNote,
@@ -55,7 +56,7 @@ import {
   rotatePages,
   splitPdf
 } from '../editing/pageOps'
-import { closeDocument, newDocument, openFromDialog, print, save, saveAs } from '../services/fileService'
+import { closeDocument, newDocument, openFromDialog, print, save, saveAs, share } from '../services/fileService'
 import { useAppStore, type AppState, type ToolId } from '../store/useAppStore'
 import { useEditStore, type EditState } from '../store/useEditStore'
 
@@ -94,7 +95,15 @@ export const actions = {
   open: { icon: FolderOpen, labelKey: 'tools.open', shortcut: 'Ctrl+O', run: () => void openFromDialog() },
   save: { icon: Save, labelKey: 'tools.save', shortcut: 'Ctrl+S', enabled: hasDoc, run: () => void save() },
   saveAs: { icon: SaveAll, labelKey: 'tools.saveAs', shortcut: 'Ctrl+Shift+S', enabled: hasDoc, run: () => void saveAs() },
-  print: { icon: Printer, labelKey: 'tools.print', shortcut: 'Ctrl+P', enabled: hasDoc, run: () => void print() },
+  print: {
+    icon: Printer,
+    labelKey: 'tools.print',
+    shortcut: 'Ctrl+P',
+    // No printing on Android; the ribbon also leaves the button out there.
+    enabled: (s) => !__ANDROID__ && hasDoc(s),
+    run: () => void print()
+  },
+  share: { icon: Share2, labelKey: 'tools.share', hidden: !__ANDROID__, enabled: hasDoc, run: () => void share() },
   close: { icon: FileX, labelKey: 'tools.close', shortcut: 'Ctrl+W', enabled: hasDoc, run: () => void closeDocument() },
   undo: {
     icon: Undo2,

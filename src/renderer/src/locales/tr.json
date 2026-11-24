@@ -94,6 +94,9 @@
       "thirdParty": "Kullanılan açık kaynak bileşenler"
     }
   },
+  "android": {
+    "documentsFolder": "Belgeler"
+  },
   "defaultApp": {
     "message": "kobiPDF şu an varsayılan PDF programınız değil. PDF dosyaları çift tıklanınca kobiPDF'te açılsın mı? Açılan Windows ayarlarında .pdf için kobiPDF'i seçin.",
     "makeDefault": "Varsayılan yap",
@@ -146,6 +149,7 @@
     "save": "Kaydet",
     "saveAs": "Farklı Kaydet",
     "print": "Yazdır",
+    "share": "Paylaş",
     "close": "Kapat",
     "undo": "Geri Al",
     "redo": "Yinele",

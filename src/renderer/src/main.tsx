@@ -1,3 +1,5 @@
+// Must stay the first import: some modules read window.api while they load.
+import '@platform-api'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './locales/i18n'

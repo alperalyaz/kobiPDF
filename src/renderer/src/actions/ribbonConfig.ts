@@ -21,7 +21,7 @@ export const ribbonTabs: RibbonTabConfig[] = [
     labelKey: 'ribbon.tabs.file',
     groups: [
       { id: 'document', labelKey: 'ribbon.groups.document', large: ['newDocument', 'open', 'save', 'saveAs', 'close'] },
-      { id: 'output', labelKey: 'ribbon.groups.output', large: ['print'] }
+      { id: 'output', labelKey: 'ribbon.groups.output', large: [__ANDROID__ ? 'share' : 'print'] }
     ]
   },
   {
@@ -100,7 +100,7 @@ export const ribbonTabs: RibbonTabConfig[] = [
 ]
 
 export const quickAccessGroups: ActionId[][] = [
-  ['open', 'save', 'print'],
+  ['open', 'save', __ANDROID__ ? 'share' : 'print'],
   ['undo', 'redo'],
   ['hand', 'select']
 ]

@@ -1,4 +1,5 @@
 // Generates app/installer icons and the in-app logo from resources/logo.svg.
+import { existsSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -14,6 +15,39 @@ const SIZE = 1024
 /** The SVG already has its rounded corners and transparent background. */
 async function buildMasterIcon() {
   return sharp(source, { density: 300 }).resize(SIZE, SIZE).png().toBuffer()
+}
+
+/** A transparent square canvas with `image` centered at `scale` of its width. */
+async function centered(image, size, scale) {
+  const inner = Math.round(size * scale)
+  const mark = await sharp(image).resize(inner, inner).png().toBuffer()
+  const offset = Math.round((size - inner) / 2)
+  return sharp({ create: { width: size, height: size, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+    .composite([{ input: mark, left: offset, top: offset }])
+    .png()
+    .toBuffer()
+}
+
+/**
+ * Android launcher icons (Capacitor project in android/). Android 8+ uses the adaptive icon:
+ * a white background (values/ic_launcher_background.xml) plus this foreground, where only the
+ * middle 66 of 108 dp is safe from the launcher's mask. Older versions use the plain PNGs.
+ */
+async function buildAndroidIcons(master) {
+  const res = resolve(root, 'android/app/src/main/res')
+  if (!existsSync(res)) return
+  const densities = { mdpi: 1, hdpi: 1.5, xhdpi: 2, xxhdpi: 3, xxxhdpi: 4 }
+  const roundMask = Buffer.from('<svg width="1024" height="1024"><circle cx="512" cy="512" r="512" fill="#fff"/></svg>')
+  const roundMaster = await sharp(roundMask).composite([{ input: await centered(master, 1024, 0.78) }]).png().toBuffer()
+  for (const [density, factor] of Object.entries(densities)) {
+    const dir = resolve(res, `mipmap-${density}`)
+    await mkdir(dir, { recursive: true })
+    const legacy = Math.round(48 * factor)
+    const adaptive = Math.round(108 * factor)
+    await sharp(master).resize(legacy, legacy).png().toFile(resolve(dir, 'ic_launcher.png'))
+    await sharp(roundMaster).resize(legacy, legacy).png().toFile(resolve(dir, 'ic_launcher_round.png'))
+    await writeFile(resolve(dir, 'ic_launcher_foreground.png'), await centered(master, adaptive, 0.6))
+  }
 }
 
 async function main() {
@@ -44,7 +78,9 @@ async function main() {
     .png()
     .toFile(resolve(appxDir, 'Wide310x150Logo.png'))
 
-  console.log('Icons generated: build/icon.png, build/icon.ico, build/appx/*.png, src/renderer/src/assets/logo.png')
+  await buildAndroidIcons(master)
+
+  console.log('Icons generated: build/icon.png, build/icon.ico, build/appx/*.png, android mipmaps, src/renderer/src/assets/logo.png')
 }
 
 main().catch((err) => {

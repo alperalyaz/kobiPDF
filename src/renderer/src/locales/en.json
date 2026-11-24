@@ -94,6 +94,9 @@
       "thirdParty": "Open-source components"
     }
   },
+  "android": {
+    "documentsFolder": "Documents"
+  },
   "defaultApp": {
     "message": "kobiPDF is not your default PDF app. Open PDFs in kobiPDF when you double-click them? In the Windows settings that open, choose kobiPDF for .pdf.",
     "makeDefault": "Make default",
@@ -146,6 +149,7 @@
     "save": "Save",
     "saveAs": "Save As",
     "print": "Print",
+    "share": "Share",
     "close": "Close",
     "undo": "Undo",
     "redo": "Redo",

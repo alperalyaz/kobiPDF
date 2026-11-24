@@ -34,18 +34,29 @@ function contentSecurityPolicy(): Plugin {
   }
 }
 
-export default defineConfig({
-  main: {},
-  preload: {},
-  renderer: {
-    define: {
-      __APP_VERSION__: JSON.stringify(pkg.version)
-    },
-    resolve: {
-      alias: {
-        '@renderer': resolve(__dirname, 'src/renderer/src')
-      }
-    },
-    plugins: [contentSecurityPolicy(), react(), tailwindcss()]
+// `--mode android` builds the renderer for the Capacitor app (see capacitor.config.json):
+// window.api then comes from platform/androidApi.ts instead of the Electron preload,
+// so no Capacitor code ends up in the desktop bundle.
+export default defineConfig(({ mode }) => {
+  const android = mode === 'android'
+  return {
+    main: {},
+    preload: {},
+    renderer: {
+      define: {
+        __APP_VERSION__: JSON.stringify(pkg.version),
+        __ANDROID__: JSON.stringify(android)
+      },
+      resolve: {
+        alias: {
+          '@renderer': resolve(__dirname, 'src/renderer/src'),
+          '@platform-api': resolve(
+            __dirname,
+            android ? 'src/renderer/src/platform/androidApi.ts' : 'src/renderer/src/platform/desktopApi.ts'
+          )
+        }
+      },
+      plugins: [contentSecurityPolicy(), react(), tailwindcss()]
+    }
   }
 })

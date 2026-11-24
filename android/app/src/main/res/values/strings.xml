@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">kobiPDF</string>
+    <string name="title_activity_main">kobiPDF</string>
+    <string name="package_name">com.hidroteknik.kobipdf</string>
+    <string name="custom_url_scheme">com.hidroteknik.kobipdf</string>
+</resources>

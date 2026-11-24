@@ -9,7 +9,7 @@ import { QuickAccessBar } from './QuickAccessBar'
 const platform = window.api.platform
 /** Space reserved for the native window controls drawn over the title bar. */
 const leftInset = platform === 'darwin' ? 'pl-[78px]' : 'pl-2'
-const rightInset = platform === 'darwin' ? 'pr-3' : 'pr-[150px]'
+const rightInset = platform === 'darwin' || __ANDROID__ ? 'pr-3' : 'pr-[150px]'
 
 export function TitleBar(): JSX.Element {
   const { t } = useTranslation()

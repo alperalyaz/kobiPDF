@@ -52,7 +52,8 @@ export type FileErrorCode =
 export type Result<T> = { ok: true; value: T } | { ok: false; code: FileErrorCode; message?: string }
 
 export interface OpenedFile {
-  path: string
+  /** null on Android: a picked file has no lasting path, so Save writes a copy instead. */
+  path: string | null
   name: string
   data: Uint8Array
 }
@@ -66,6 +67,8 @@ export interface OpenedImage {
 export interface SavedFile {
   path: string
   name: string
+  /** Where the user can find the file, when the name alone does not say it (Android). */
+  location?: string
 }
 
 export type AppLanguage = 'tr' | 'en'
@@ -104,4 +107,6 @@ export interface KobiPdfApi {
   confirmClose: () => void
   onCloseRequested: (callback: () => void) => () => void
   onOpenExternalFile: (callback: (path: string) => void) => () => void
+  /** Opens the system share sheet for a saved file. Android only. */
+  shareFile?: (path: string) => Promise<void>
 }

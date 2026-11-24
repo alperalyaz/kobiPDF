@@ -1,0 +1,8 @@
+﻿{
+  "appId": "com.hidroteknik.kobipdf",
+  "appName": "kobiPDF",
+  "webDir": "out/renderer",
+  "android": {
+    "minWebViewVersion": 110
+  }
+}

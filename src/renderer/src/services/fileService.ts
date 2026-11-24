@@ -123,7 +123,7 @@ export async function saveAs(): Promise<boolean> {
   }
   store().updateDocument({ path: result.value.path, name: result.value.name })
   markSaved()
-  store().showNotice({ kind: 'info', key: 'messages.saved', params: { name: result.value.name } })
+  store().showNotice({ kind: 'info', key: 'messages.saved', params: { name: result.value.location ?? result.value.name } })
   return true
 }
 
@@ -139,8 +139,15 @@ export async function save(): Promise<boolean> {
     return false
   }
   markSaved()
-  store().showNotice({ kind: 'info', key: 'messages.saved', params: { name: result.value.name } })
+  store().showNotice({ kind: 'info', key: 'messages.saved', params: { name: result.value.location ?? result.value.name } })
   return true
+}
+
+/** Android: saves (a copy, the first time) and opens the share sheet for that file. */
+export async function share(): Promise<void> {
+  if (!window.api.shareFile || !(await save())) return
+  const path = store().document?.path
+  if (path) await window.api.shareFile(path)
 }
 
 export async function print(): Promise<void> {

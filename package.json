@@ -19,9 +19,18 @@
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "build": "npm run typecheck && electron-vite build",
     "dist:win": "npm run icons && npm run build && electron-builder --win",
-    "dist:mac": "npm run icons && npm run build && electron-builder --mac"
+    "dist:mac": "npm run icons && npm run build && electron-builder --mac",
+    "build:android": "npm run typecheck && npm run pdfjs-assets && electron-vite build --mode android",
+    "android:sync": "npm run build:android && cap sync android",
+    "android:run": "npm run android:sync && cap run android"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/cli": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/share": "^8.0.3",
     "@pdf-lib/fontkit": "^1.1.1",
     "@tailwindcss/vite": "^4.3.4",
     "@types/node": "^26.6.6",
