@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Same policy as the desktop app, to see what the Capacitor bridge needs. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; worker-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'" />
+    <title>kobiPDF Android deneme</title>
+    <style>
+      body { font: 14px system-ui, sans-serif; margin: 12px; color: #111; }
+      button, label.file { display: inline-block; margin: 4px 4px 4px 0; padding: 10px 14px; border-radius: 8px; border: 0; background: #135ca9; color: #fff; font-size: 15px; }
+      input[type=file] { display: none; }
+      #log { white-space: pre-wrap; font: 12px ui-monospace, monospace; background: #f3f4f6; padding: 8px; border-radius: 6px; margin-top: 8px; }
+      .pages { display: flex; gap: 8px; margin-top: 8px; }
+      .pages figure { margin: 0; flex: 1; }
+      canvas { width: 100%; border: 1px solid #ccc; }
+    </style>
+  </head>
+  <body>
+    <h3>kobiPDF Android deneme (Adım 0)</h3>
+    <button id="ornek">Örnek PDF ile dene</button>
+    <label class="file">Telefondan PDF seç<input id="dosya" type="file" accept="application/pdf" /></label>
+    <button id="kaydet" disabled>Sonucu kaydet ve paylaş</button>
+    <div class="pages">
+      <figure><figcaption>Önce</figcaption><canvas id="once"></canvas></figure>
+      <figure><figcaption>Sonra</figcaption><canvas id="sonra"></canvas></figure>
+    </div>
+    <div id="log"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

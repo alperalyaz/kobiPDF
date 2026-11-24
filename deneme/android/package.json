@@ -1,0 +1,17 @@
+{
+  "name": "kobipdf-android-deneme",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "../../node_modules/.bin/vite build",
+    "android": "../../node_modules/.bin/vite build && npx cap sync android && npx cap run android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.2",
+    "@capacitor/cli": "8.6.2",
+    "@capacitor/core": "8.6.2",
+    "@capacitor/filesystem": "8.1.5",
+    "@capacitor/share": "8.0.3"
+  }
+}
