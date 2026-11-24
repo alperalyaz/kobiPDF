@@ -33,6 +33,7 @@ const TABS: { id: TabId; icon: LucideIcon }[] = [
 const FONT_LICENSES = [arimoLicense, tinosLicense, cousineLicense, carlitoLicense, gelasioLicense]
 
 const HOWTO_STEPS =['open', 'navigate', 'text', 'markup', 'signature', 'pages', 'save'] as const
+const PHONE_HOWTO_STEPS = ['open', 'navigate', 'text', 'signature', 'save'] as const
 const FAQ_ITEMS = ['free', 'offline', 'default', 'scanned', 'encrypted', 'undo', 'bug'] as const
 
 /** Third-party components shipped inside the app, with their licenses. */
@@ -101,14 +102,24 @@ function Kbd({ children }: { children: ReactNode }): JSX.Element {
 }
 
 export function AboutDialog({ onClose }: { onClose: () => void }): JSX.Element {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [tab, setTab] = useState<TabId>('general')
 
+  // On the phone the tabs sit in a scrolling row above the content, and keyboard shortcuts are left out.
+  const phone = __ANDROID__
+  const tabs = phone ? TABS.filter((item) => item.id !== 'shortcuts') : TABS
+  const howtoSteps = phone ? PHONE_HOWTO_STEPS : HOWTO_STEPS
+  // Phone wording lives under about.phone.*; anything not rewritten there uses the desktop text.
+  const tx = (key: string): string =>
+    phone && i18n.exists(key.replace(/^about\./, 'about.phone.')) ? t(key.replace(/^about\./, 'about.phone.')) : t(key)
+
   const onTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>): void => {
-    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
+    const forward = phone ? 'ArrowRight' : 'ArrowDown'
+    const back = phone ? 'ArrowLeft' : 'ArrowUp'
+    if (event.key !== forward && event.key !== back) return
     event.preventDefault()
-    const index = TABS.findIndex((item) => item.id === tab)
-    const next = TABS[(index + (event.key === 'ArrowDown' ? 1 : TABS.length - 1)) % TABS.length]
+    const index = tabs.findIndex((item) => item.id === tab)
+    const next = tabs[(index + (event.key === forward ? 1 : tabs.length - 1)) % tabs.length]
     setTab(next.id)
     document.getElementById(`about-tab-${next.id}`)?.focus()
   }
@@ -124,13 +135,17 @@ export function AboutDialog({ onClose }: { onClose: () => void }): JSX.Element {
         </DialogButton>
       }
     >
-      <div className="-mx-4 -my-3 flex h-[480px] max-h-[70vh]">
+      <div className={phone ? '-mx-4 -my-3 flex h-[70vh] flex-col' : '-mx-4 -my-3 flex h-[480px] max-h-[70vh]'}>
         <div
           role="tablist"
-          aria-orientation="vertical"
-          className="flex w-[190px] shrink-0 flex-col gap-0.5 border-r border-chrome-border bg-chrome p-2"
+          aria-orientation={phone ? 'horizontal' : 'vertical'}
+          className={
+            phone
+              ? 'flex shrink-0 gap-1 overflow-x-auto border-b border-chrome-border bg-chrome p-2'
+              : 'flex w-[190px] shrink-0 flex-col gap-0.5 border-r border-chrome-border bg-chrome p-2'
+          }
         >
-          {TABS.map(({ id, icon: Icon }) => (
+          {tabs.map(({ id, icon: Icon }) => (
             <button
               key={id}
               id={`about-tab-${id}`}
@@ -138,9 +153,13 @@ export function AboutDialog({ onClose }: { onClose: () => void }): JSX.Element {
               role="tab"
               aria-selected={tab === id}
               tabIndex={tab === id ? 0 : -1}
-              onClick={() => setTab(id)}
+              onClick={(event) => {
+                setTab(id)
+                // A tab half hidden at the edge of the phone's scrolling row slides fully into view.
+                if (phone) event.currentTarget.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })
+              }}
               onKeyDown={onTabKeyDown}
-              className={`flex items-center gap-2 rounded px-2.5 py-2 text-left text-[12px] ${
+              className={`flex items-center gap-2 rounded px-2.5 py-2 text-left text-[12px] ${phone ? 'shrink-0 whitespace-nowrap' : ''} ${
                 tab === id ? 'bg-white font-semibold text-brand shadow-sm' : 'text-ink hover:bg-white/70'
               }`}
             >
@@ -150,15 +169,18 @@ export function AboutDialog({ onClose }: { onClose: () => void }): JSX.Element {
           ))}
         </div>
 
-        <div role="tabpanel" className="flex-1 overflow-y-auto px-5 py-4 text-[12px] leading-relaxed text-ink">
+        <div
+          role="tabpanel"
+          className={`min-h-0 flex-1 overflow-y-auto ${phone ? 'px-4' : 'px-5'} py-4 text-[12px] leading-relaxed text-ink`}
+        >
           {tab === 'general' && (
             <>
-              <div className="flex items-center gap-4">
-                <img src={logoFull} alt={t('app.name')} className="h-28 w-auto" draggable={false} />
+              <div className={phone ? 'flex flex-col items-center gap-1' : 'flex items-center gap-4'}>
+                <img src={logoFull} alt={t('app.name')} className={phone ? 'h-24 w-auto' : 'h-28 w-auto'} draggable={false} />
                 <p className="text-[13px] font-semibold text-ink-muted">{t('about.version', { version: VERSION })}</p>
               </div>
               <p className="mt-3">{t('app.tagline')}</p>
-              <p className="mt-2 text-ink-muted">{t('app.aboutText')}</p>
+              <p className="mt-2 text-ink-muted">{phone ? t('about.phone.aboutText') : t('app.aboutText')}</p>
               <div className="mt-4 flex flex-col gap-2">
                 <ExternalLinkRow href={REPO_URL} label={t('about.links.repo')} detail="github.com/alperalyaz/kobiPDF" />
                 <ExternalLinkRow href={ISSUES_URL} label={t('about.links.issues')} detail={t('about.links.issuesDetail')} />
@@ -183,21 +205,21 @@ export function AboutDialog({ onClose }: { onClose: () => void }): JSX.Element {
 
           {tab === 'howto' && (
             <ol className="flex flex-col gap-3">
-              {HOWTO_STEPS.map((step, index) => (
+              {howtoSteps.map((step, index) => (
                 <li key={step} className="flex gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-[11px] font-semibold text-white">
                     {index + 1}
                   </span>
                   <span>
-                    <span className="block font-semibold">{t(`about.howto.${step}.title`)}</span>
-                    <span className="block text-ink-muted">{t(`about.howto.${step}.body`)}</span>
+                    <span className="block font-semibold">{tx(`about.howto.${step}.title`)}</span>
+                    <span className="block text-ink-muted">{tx(`about.howto.${step}.body`)}</span>
                   </span>
                 </li>
               ))}
             </ol>
           )}
 
-          {tab === 'shortcuts' && (
+          {tab === 'shortcuts' && !phone && (
             <table className="w-full border-collapse">
               <tbody>
                 {shortcutRows().map(({ labelKey, keys }) => (
@@ -226,8 +248,8 @@ export function AboutDialog({ onClose }: { onClose: () => void }): JSX.Element {
             <div className="flex flex-col gap-3">
               {FAQ_ITEMS.map((item) => (
                 <div key={item}>
-                  <p className="font-semibold">{t(`about.faq.${item}.q`)}</p>
-                  <p className="text-ink-muted">{t(`about.faq.${item}.a`)}</p>
+                  <p className="font-semibold">{tx(`about.faq.${item}.q`)}</p>
+                  <p className="text-ink-muted">{tx(`about.faq.${item}.a`)}</p>
                 </div>
               ))}
             </div>

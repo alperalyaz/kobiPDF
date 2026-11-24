@@ -95,6 +95,49 @@
       "license": "kobiPDF is free software distributed under the GNU Affero General Public License version 3 (AGPL-3.0). You may use, study, modify and share it under the same license.",
       "thirdParty": "Open-source components",
       "fontLicenses": "Font license texts"
+    },
+    "phone": {
+      "aboutText": "An offline app for opening, editing, signing and sharing your documents on your phone.",
+      "howto": {
+        "open": {
+          "title": "Open a PDF",
+          "body": "Tap Open in the ⋮ menu at the top right. You can also tap a PDF in Files, email or WhatsApp and choose kobiPDF under \"Open with\" or \"Share\"."
+        },
+        "navigate": {
+          "title": "Move around the document",
+          "body": "Scroll with your finger and pinch with two fingers to zoom. Fit Width in the ⋮ menu fits the page to the screen."
+        },
+        "text": {
+          "title": "Add or fix text",
+          "body": "Tap Text at the bottom. With New text selected, tap anywhere on the page and type; with Fix text selected, tap existing text to change it. Tap Done when finished."
+        },
+        "signature": {
+          "title": "Add a signature or stamp",
+          "body": "Tap Sign at the bottom, then draw your signature with your finger or load a picture of your stamp. Once placed, drag it and resize it from its corners."
+        },
+        "save": {
+          "title": "Save or share",
+          "body": "The save button at the top saves the document to Documents/kobiPDF, and the share button sends it by email or WhatsApp. The back arrow undoes the last change."
+        }
+      },
+      "faq": {
+        "offline": {
+          "q": "Do I need the internet? Are my documents sent anywhere?",
+          "a": "No. kobiPDF runs entirely on your phone and your documents are never uploaded. The internet is only used when you open a link in the About window."
+        },
+        "default": {
+          "q": "How do I make PDFs open in kobiPDF when I tap them?",
+          "a": "When you tap a PDF, pick kobiPDF from the list and choose \"Always\". If you picked another app before, clear \"Open by default\" on that app's page under Settings > Apps."
+        },
+        "scanned": {
+          "q": "Why can't I edit the text on a scanned page?",
+          "a": "Scanned pages are pictures, not text, so Fix text doesn't work on them. You can add new text to them with New text."
+        },
+        "undo": {
+          "q": "I changed something by mistake. Can I undo it?",
+          "a": "Yes. The back arrow at the top undoes the last change. If you close a document with unsaved changes, kobiPDF asks you first."
+        }
+      }
     }
   },
   "android": {

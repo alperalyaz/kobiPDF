@@ -95,6 +95,49 @@
       "license": "kobiPDF, GNU Affero Genel Kamu Lisansı sürüm 3 (AGPL-3.0) ile dağıtılan özgür yazılımdır. Programı kullanabilir, inceleyebilir, değiştirebilir ve aynı lisansla paylaşabilirsiniz.",
       "thirdParty": "Kullanılan açık kaynak bileşenler",
       "fontLicenses": "Yazı tipi lisans metinleri"
+    },
+    "phone": {
+      "aboutText": "Belgelerinizi telefonunuzda açmak, düzenlemek, imzalamak ve paylaşmak için tasarlanmış çevrimdışı bir uygulamadır.",
+      "howto": {
+        "open": {
+          "title": "PDF açın",
+          "body": "Sağ üstteki ⋮ menüsünden Aç'a dokunun. Dosyalar, e-posta veya WhatsApp'ta bir PDF'e dokunup \"Birlikte aç\" ya da \"Paylaş\" ile kobiPDF'i seçmeniz de yeterlidir."
+        },
+        "navigate": {
+          "title": "Belgede gezinin",
+          "body": "Parmağınızla kaydırın; iki parmakla açıp kapatarak yakınlaştırın. ⋮ menüsündeki Genişliğe sığdır sayfayı ekrana oturtur."
+        },
+        "text": {
+          "title": "Metin ekleyin veya düzeltin",
+          "body": "Alttaki Metin'e dokunun. Yeni metin seçiliyken sayfada bir yere dokunup yazın; Yazı düzelt seçiliyken belgedeki bir yazıya dokunup değiştirin. Bitince Tamam'a basın."
+        },
+        "signature": {
+          "title": "İmza veya kaşe koyun",
+          "body": "Alttaki İmza'ya dokunun; imzanızı parmağınızla çizin ya da kaşenizin resmini yükleyin. Yerleştirdikten sonra sürükleyip köşelerinden boyutlandırabilirsiniz."
+        },
+        "save": {
+          "title": "Kaydedin veya paylaşın",
+          "body": "Üstteki kaydet düğmesi belgeyi Belgeler/kobiPDF klasörüne kaydeder, paylaş düğmesi e-posta veya WhatsApp ile göndermenizi sağlar. Geri ok son değişikliği geri alır."
+        }
+      },
+      "faq": {
+        "offline": {
+          "q": "İnternet gerekiyor mu? Belgelerim bir yere gönderiliyor mu?",
+          "a": "Hayır. kobiPDF tamamen telefonunuzda çalışır; belgeleriniz hiçbir sunucuya yüklenmez. İnternet yalnızca Hakkında penceresindeki bağlantıları açtığınızda kullanılır."
+        },
+        "default": {
+          "q": "PDF'lere dokununca kobiPDF'te nasıl açarım?",
+          "a": "Bir PDF'e dokunduğunuzda çıkan listeden kobiPDF'i seçip \"Her zaman\" deyin. Daha önce başka bir uygulama seçtiyseniz o uygulamanın Ayarlar > Uygulamalar sayfasından \"Varsayılan olarak aç\" ayarını temizleyin."
+        },
+        "scanned": {
+          "q": "Taranmış bir sayfadaki yazıyı neden düzenleyemiyorum?",
+          "a": "Taranmış sayfalar yazı değil resimdir, bu yüzden Yazı düzelt onlarda çalışmaz. Bu sayfalara Yeni metin ile yazı ekleyebilirsiniz."
+        },
+        "undo": {
+          "q": "Yanlışlıkla bir şeyi değiştirdim, geri alabilir miyim?",
+          "a": "Evet. Üstteki geri ok son değişikliği geri alır. Kaydedilmemiş değişiklikler varken belgeyi kapatırsanız kobiPDF size sorar."
+        }
+      }
     }
   },
   "android": {
