@@ -204,7 +204,7 @@ Sipariş sonrası: paneldeki adresleri kapalı test e-posta listesine ekle, test
 **Durum (2026-11-24):** kapalı test incelemesi geçti, 0.5.0 (50000) kapalı test kanalında yayında.
 PrimeTestLab siparişi P07026973 (Starter, 12 testçi, 14 gün) ödendi ve kuruldu. Testçiler kapalı teste e-posta listesiyle
 değil Google Grubuyla eklendi: khadem-testers-service@googlegroups.com (bu yüzden "Hidroteknik Test" listesi artık kapalı
-testte değil; dahili testte duruyor). Değişiklik Google incelemesine gönderildi; PrimeTestLab onaydan sonra 30 dk-8 saat
+testte değil; dahili testte duruyor). Google bu değişikliği 2026-11-24 21:48 onayladı (yayında); PrimeTestLab onaydan sonra 30 dk-8 saat
 içinde başlatır. 14 gün dolunca Dashboard'dan üretim erişimi başvurusu.
 
 **Açık kalanlar:** 14 gün sonra üretim başvurusu; Play'den
