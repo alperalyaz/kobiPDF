@@ -1,7 +1,7 @@
 # kobiPDF Android planı (Capacitor, aynı repo)
 
-Durum: Adım 0-4 tamamlandı (24.11.2026). Dallar zincir halinde: `bekleyen/android-adim1` -> `adim2` -> `adim3` ->
-`adim4` (her biri bir öncekinin üstünde). Sıradaki: Adım 5 (yayın).
+Durum (24.11.2026): Adım 0-4 `main`'de. Adım 5: Play'de kapalı test incelemede; PrimeTestLab siparişi ve 14 günlük
+test bekleniyor, sonra üretim erişimi başvurusu.
 Plan eleştirisinden geçti; bulgular aşağıya işlendi.
 
 ## Derleme (Windows, USB ile bağlı telefon)
@@ -180,6 +180,29 @@ bellek ölçülmedi (12 DejaVu + 20 ikiz yüz açılışta yükleniyor); Helveti
   (`.gitignore`: `*.jks`, `*.keystore`, `keystore.properties`; derlemede kontrol).
 - Hakkında penceresindeki lisans listesi: yapıldı (Adım 4).
 - Play: güncel hedef API seviyesi, tanıtım metni, gizlilik sayfası (hidroteknik.si/gizlilik/kobipdf).
+
+**Yapılan (plan eleştirisinden sonra):**
+- Yükleme anahtarı `C:\Users\user\kobipdf-android-keys\` (upload.jks + keystore.properties, PKCS12, RSA 4096); repo dışında,
+  GitHub Secrets'ta da (ANDROID_KEYSTORE_BASE64 / _PASSWORD / ANDROID_KEY_ALIAS). Play App Signing açık.
+- Yerel imzalı derleme: `$env:KOBIPDF_KEYSTORE_PROPERTIES = "C:\Users\user\kobipdf-android-keys\keystore.properties"`,
+  `npm run android:sync`, `android\gradlew.bat bundleRelease`. İmza kontrolü yalnız release görevlerinde.
+- CI: `.github/workflows/android.yml`, `android-v*` etiketi ya da elle; AAB artefakt olarak (GitHub Release'e konmaz).
+- versionCode = major*1000000 + minor*10000 + patch*100 + ANDROID_BUILD (0.5.0 -> 50000). Asla küçültülmez.
+- `allowBackup=false`: kayıtlı imzalar buluta yedeklenmez. Hakkında'da gizlilik politikası bağlantısı (Play şartı).
+- Mağaza: `docs/store/play/` (TR/EN metin, 512 simge, 1024x500 öne çıkan görsel, 5 telefon görüntüsü 1080x2160).
+  Ekran görüntüleri Android derlemesinin tarayıcıda 392x840 @2,75 (Redmi 12) çiziminden, puppeteer-core + başsız Chrome.
+- Play Console (Hidroteknik, kişisel hesap): uygulama "kobiPDF: PDF Düzenle, İmzala", ücretsiz, varsayılan dil Türkçe.
+  Beyanlar: veri toplanmıyor, reklam yok, reklam kimliği yok, 18+, IARC 3+ / PEGI 3, devlet/finans/sağlık değil, tacir
+  (hesaptan). Kategori Verimlilik; iletişim software@hidroteknik.com.tr, web https://www.hidroteknik.si.
+- Dahili test yayında (Hidroteknik Test listesi): https://play.google.com/apps/internaltest/4701270612403500765
+- Kapalı test (Alpha, 178 ülke) Google incelemesine gönderildi. Katılım: https://play.google.com/apps/testing/com.hidroteknik.kobipdf
+
+**Kişisel hesap kuralı:** üretimden önce kapalı test, en az 12 testçi 14 gün kesintisiz; sonra Dashboard'dan üretim erişimi
+başvurusu. Testçiler PrimeTestLab'den (primetestlab.com, Enterprise 25 testçi, 29,49 $; önceki siparişler Megafon vb.).
+Sipariş sonrası: paneldeki adresleri kapalı test e-posta listesine ekle, test bağlantısını panele gir.
+
+**Açık kalanlar:** PrimeTestLab ödemesi (kullanıcı); testçi listesinin eklenmesi; 14 gün sonra üretim başvurusu; Play'den
+kurulan imzalı sürümün telefonda denenmesi (dahili test bağlantısı); İngilizce sayfaya İngilizce ekran görüntüleri.
 
 ## Çalışma düzeni
 Telefonda deneme gereken her adım (0, 2, 3, 5) yerel oturumda, USB bağlı telefonla yapılır.
