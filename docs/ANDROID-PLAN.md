@@ -1,6 +1,6 @@
 # kobiPDF Android planı (Capacitor, aynı repo)
 
-Durum: plan, henüz kod yok. 24.11.2026. Plan eleştirisinden geçti; bulgular aşağıya işlendi.
+Durum: Adım 0 tamamlandı, sonuç olumlu (24.11.2026). Adım 1'e geçilebilir. Plan eleştirisinden geçti; bulgular aşağıya işlendi.
 
 ## Kapsam (v1)
 Var: PDF aç (dosya seçici ve "Birlikte aç / Paylaş"), görüntüle (kaydırma, iki parmakla yakınlaştırma),
@@ -16,6 +16,13 @@ En büyük belirsizlik MuPDF'in (WebAssembly, yaklaşık 10 MB) telefondaki WebV
 - Ölçülecekler: 1 MB, 10 MB ve 50 MB PDF ile çalışıyor mu, ne kadar sürüyor, çöküyor mu; en düşük Android / WebView sürümü;
   Capacitor köprüsünün CSP'den ne istediği.
 - Sonuç kötüyse: kapsam "yalnız imza / kaşe" (MuPDF'siz, pdf-lib ile) olur ya da Android iptal edilir.
+
+**Sonuç (24.11.2026, Redmi 12, Android 15, 8 GB, WebView 149): OLUMLU, kapsam aynen kalır.**
+1 MB, 10,8 MB ve 53,4 MB gerçek PDF'lerde MuPDF ile silme ve pdf-lib ile kaydetme çalıştı; çökme ve CSP engeli olmadı.
+MuPDF silme en fazla 4,9 sn. Tek sorun kaydetme süresi: 53 MB'da pdf-lib `save()` 23 sn, 10 MB'da 2,9 sn.
+Bundan çıkan iş: Adım 2'de kaydederken ilerleme göstergesi; büyük dosyada kaydetmeyi hızlandırmak için
+`save({ useObjectStreams: false })` ya da kaydetmeyi MuPDF'e bırakmak denenmeli.
+Henüz denenmeyen: "Kaydet ve paylaş", Android 7–9 gibi eski cihazlar, 4 GB ve altı RAM. Ayrıntı: `deneme/android/README.md`.
 
 ## Adım 1 - Ortak kod: tek arayüz, Android için `window.api` taklidi
 - İkinci bir giriş (ayrı mobil uygulama, ikinci Vite ayarı) YOK. Mevcut renderer kullanılır; Capacitor `webDir` onun çıktısıdır.
