@@ -147,6 +147,19 @@ export function AboutDialog({ onClose }: { onClose: () => void }): JSX.Element {
                 <ExternalLinkRow href={REPO_URL} label={t('about.links.repo')} detail="github.com/alperalyaz/kobiPDF" />
                 <ExternalLinkRow href={ISSUES_URL} label={t('about.links.issues')} detail={t('about.links.issuesDetail')} />
                 <ExternalLinkRow href={WEBSITE_URL} label={t('about.links.website')} detail="www.hidroteknik.si" />
+                {window.api.platform === 'win32' && (
+                  <button
+                    type="button"
+                    onClick={() => void window.api.openDefaultAppsSettings()}
+                    className="flex items-center justify-between rounded border border-chrome-border px-3 py-2 text-left hover:bg-chrome"
+                  >
+                    <span>
+                      <span className="block font-medium text-ink">{t('defaultApp.makeDefault')}</span>
+                      <span className="block text-[11px] text-ink-muted">{t('about.links.defaultDetail')}</span>
+                    </span>
+                    <ExternalLink size={14} className="shrink-0 text-brand" />
+                  </button>
+                )}
               </div>
             </>
           )}

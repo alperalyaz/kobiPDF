@@ -20,7 +20,8 @@
       "repo": "Source code (GitHub)",
       "issues": "Report a bug or suggest a feature",
       "issuesDetail": "Opens the GitHub Issues page",
-      "website": "Hidroteknik website"
+      "website": "Hidroteknik website",
+      "defaultDetail": "Choose kobiPDF for .pdf in Windows settings"
     },
     "howto": {
       "open": {
@@ -92,6 +93,11 @@
       "license": "kobiPDF is free software distributed under the GNU Affero General Public License version 3 (AGPL-3.0). You may use, study, modify and share it under the same license.",
       "thirdParty": "Open-source components"
     }
+  },
+  "defaultApp": {
+    "message": "kobiPDF is not your default PDF app. Open PDFs in kobiPDF when you double-click them? In the Windows settings that open, choose kobiPDF for .pdf.",
+    "makeDefault": "Make default",
+    "neverAsk": "Don't ask again"
   },
   "common": {
     "language": "Language",

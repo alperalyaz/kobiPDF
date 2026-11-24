@@ -20,7 +20,8 @@
       "repo": "Kaynak kodu (GitHub)",
       "issues": "Hata bildir veya öneride bulun",
       "issuesDetail": "GitHub Issues sayfası açılır",
-      "website": "Hidroteknik web sitesi"
+      "website": "Hidroteknik web sitesi",
+      "defaultDetail": "Windows ayarlarında .pdf için kobiPDF'i seçin"
     },
     "howto": {
       "open": {
@@ -92,6 +93,11 @@
       "license": "kobiPDF, GNU Affero Genel Kamu Lisansı sürüm 3 (AGPL-3.0) ile dağıtılan özgür yazılımdır. Programı kullanabilir, inceleyebilir, değiştirebilir ve aynı lisansla paylaşabilirsiniz.",
       "thirdParty": "Kullanılan açık kaynak bileşenler"
     }
+  },
+  "defaultApp": {
+    "message": "kobiPDF şu an varsayılan PDF programınız değil. PDF dosyaları çift tıklanınca kobiPDF'te açılsın mı? Açılan Windows ayarlarında .pdf için kobiPDF'i seçin.",
+    "makeDefault": "Varsayılan yap",
+    "neverAsk": "Bir daha sorma"
   },
   "common": {
     "language": "Dil",

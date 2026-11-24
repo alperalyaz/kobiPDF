@@ -238,7 +238,7 @@ export async function exportEdits(
       : []
   )
   const erased = await eraseText(bytes, erases, pageSizes)
-  const doc = await PDFDocument.load(erased ?? bytes)
+  const doc = await PDFDocument.load(erased ?? bytes, { updateMetadata: false })
   doc.registerFontkit(fontkit)
   const ctx: Context = { doc, fonts: new Map(), images: new Map(), textErased: erased !== null }
   const pages = doc.getPages()

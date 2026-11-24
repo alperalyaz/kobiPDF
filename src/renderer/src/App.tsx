@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { LoaderCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { DialogHost } from './components/dialogs/DialogHost'
+import { DefaultAppBanner } from './components/layout/DefaultAppBanner'
 import { DocumentTabs } from './components/layout/DocumentTabs'
 import { NoticeBar } from './components/layout/NoticeBar'
 import { PropertiesBar } from './components/layout/PropertiesBar'
@@ -70,6 +71,7 @@ export default function App(): JSX.Element {
       <DocumentTabs />
       <Ribbon />
       <PropertiesBar />
+      <DefaultAppBanner />
       <div className="flex min-h-0 flex-1">
         <Sidebar />
         <main className="relative min-w-0 flex-1">

@@ -4,6 +4,7 @@ import { exportCurrent, reportEditError, reportFailure, showDocument } from '../
 import { targetPages, useAppStore } from '../store/useAppStore'
 import { commitDraft } from './draft'
 import { changeBytes } from './history'
+import { withKobiMetadata } from './pdfMetadata'
 import type { EditObject } from './types'
 
 const store = useAppStore.getState
@@ -26,7 +27,7 @@ async function guarded(task: () => Promise<void>): Promise<void> {
 export function rotatePages(delta: 90 | -90): Promise<void> {
   return guarded(async () => {
     const doc = store().document!
-    const pdf = await PDFDocument.load(doc.bytes)
+    const pdf = await PDFDocument.load(doc.bytes, { updateMetadata: false })
     for (const pageNumber of targetPages()) {
       const page = pdf.getPage(pageNumber - 1)
       page.setRotation(degrees((((page.getRotation().angle + delta) % 360) + 360) % 360))
@@ -51,7 +52,7 @@ export function deletePages(): Promise<void> {
       danger: true
     })
     if (!confirmed) return
-    const pdf = await PDFDocument.load(doc.bytes)
+    const pdf = await PDFDocument.load(doc.bytes, { updateMetadata: false })
     const { width, height } = pdf.getPage(0).getSize()
     for (const pageNumber of [...pages].sort((a, b) => b - a)) pdf.removePage(pageNumber - 1)
     if (all) pdf.addPage([width, height])
@@ -72,7 +73,7 @@ export function reorderPages(order: number[]): Promise<void> {
   return guarded(async () => {
     const doc = store().document!
     if (order.every((old, i) => old === i)) return
-    const source = await PDFDocument.load(doc.bytes)
+    const source = await PDFDocument.load(doc.bytes, { updateMetadata: false })
     const pdf = await PDFDocument.create()
     for (const page of await pdf.copyPages(source, order)) pdf.addPage(page)
     const newIndex = new Map(order.map((old, i) => [old, i]))
@@ -126,9 +127,9 @@ export function extractPages(): Promise<void> {
     if (!indices) return
     const bytes = await exportCurrent()
     if (!bytes) return
-    const out = await copyToNewDocument(await PDFDocument.load(bytes), indices)
+    const out = await copyToNewDocument(await PDFDocument.load(bytes, { updateMetadata: false }), indices)
     const suffix = formatPageRanges(indices.map((i) => i + 1)).replace(/\s/g, '').replace(/,/g, '_')
-    const result = await window.api.saveFileAs(out, `${baseName(doc.name)}-${suffix}.pdf`)
+    const result = await window.api.saveFileAs(await withKobiMetadata(out), `${baseName(doc.name)}-${suffix}.pdf`)
     if (!result.ok) return reportFailure(result)
     store().showNotice({ kind: 'info', key: 'messages.extracted', params: { name: result.value.name } })
   })
@@ -142,9 +143,9 @@ export async function mergePdfs(): Promise<void> {
   const doc = store().document
   try {
     store().setLoading(true)
-    const base = doc ? await PDFDocument.load(doc.bytes) : await PDFDocument.create()
+    const base = doc ? await PDFDocument.load(doc.bytes, { updateMetadata: false }) : await PDFDocument.create()
     for (const file of files) {
-      const source = await PDFDocument.load(file.data)
+      const source = await PDFDocument.load(file.data, { updateMetadata: false })
       for (const page of await base.copyPages(source, source.getPageIndices())) base.addPage(page)
     }
     const bytes = await base.save()
@@ -172,12 +173,12 @@ export function splitPdf(): Promise<void> {
     try {
       const bytes = await exportCurrent()
       if (!bytes) return
-      const source = await PDFDocument.load(bytes)
+      const source = await PDFDocument.load(bytes, { updateMetadata: false })
       const digits = String(groups.length).length
       for (const [i, group] of groups.entries()) {
         const out = await copyToNewDocument(source, group)
         const name = `${baseName(doc.name)}-${String(i + 1).padStart(digits, '0')}.pdf`
-        const written = await window.api.writeInDirectory(dir.value, name, out)
+        const written = await window.api.writeInDirectory(dir.value, name, await withKobiMetadata(out))
         if (!written.ok) return reportFailure(written)
       }
       store().showNotice({ kind: 'info', key: 'messages.split', params: { count: String(groups.length) } })

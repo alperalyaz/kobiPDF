@@ -3,6 +3,7 @@ import type { OpenedFile, Result } from '../../../shared/ipc'
 import { openDialog } from '../components/dialogs/dialogStore'
 import { commitDraft } from '../editing/draft'
 import { exportEdits } from '../editing/exportEdits'
+import { withKobiMetadata } from '../editing/pdfMetadata'
 import { isDirty, markSaved } from '../editing/history'
 import { useAppStore } from '../store/useAppStore'
 import { useEditStore } from '../store/useEditStore'
@@ -115,7 +116,7 @@ export async function saveAs(): Promise<boolean> {
   if (!doc) return false
   const bytes = await exportOrReport()
   if (!bytes) return false
-  const result = await window.api.saveFileAs(bytes, doc.name)
+  const result = await window.api.saveFileAs(await withKobiMetadata(bytes), doc.name)
   if (!result.ok) {
     reportFailure(result)
     return false
@@ -132,7 +133,7 @@ export async function save(): Promise<boolean> {
   if (!doc.path) return saveAs()
   const bytes = await exportOrReport()
   if (!bytes) return false
-  const result = await window.api.saveFile(doc.path, bytes)
+  const result = await window.api.saveFile(doc.path, await withKobiMetadata(bytes))
   if (!result.ok) {
     reportFailure(result)
     return false

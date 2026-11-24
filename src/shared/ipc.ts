@@ -14,6 +14,8 @@ export const IpcChannels = {
   appSetDirty: 'app:set-dirty',
   appCloseRequested: 'app:close-requested',
   appConfirmClose: 'app:confirm-close',
+  appDefaultPdfStatus: 'app:default-pdf-status',
+  appOpenDefaultApps: 'app:open-default-apps',
   fontsList: 'fonts:list',
   fontsRead: 'fonts:read'
 } as const
@@ -68,6 +70,9 @@ export interface SavedFile {
 
 export type AppLanguage = 'tr' | 'en'
 
+/** 'unsupported': not Windows, or a development build that Windows does not know about. */
+export type DefaultPdfStatus = 'default' | 'notDefault' | 'unsupported'
+
 export interface PrinterInfo {
   name: string
   displayName: string
@@ -93,6 +98,8 @@ export interface KobiPdfApi {
   listSystemFonts: () => Promise<SystemFontId[]>
   readSystemFont: (id: SystemFontId, variant: number) => Promise<Uint8Array | null>
   getPendingFile: () => Promise<string | null>
+  getDefaultPdfStatus: () => Promise<DefaultPdfStatus>
+  openDefaultAppsSettings: () => Promise<void>
   setDirty: (dirty: boolean) => void
   confirmClose: () => void
   onCloseRequested: (callback: () => void) => () => void
