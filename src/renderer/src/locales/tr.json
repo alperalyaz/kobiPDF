@@ -20,6 +20,8 @@
       "repo": "Kaynak kodu (GitHub)",
       "issues": "Hata bildir veya öneride bulun",
       "issuesDetail": "GitHub Issues sayfası açılır",
+      "privacy": "Gizlilik politikası",
+      "privacyDetail": "Hiçbir veri toplanmaz; politikanın tamamı",
       "website": "Hidroteknik web sitesi",
       "defaultDetail": "Windows ayarlarında .pdf için kobiPDF'i seçin"
     },

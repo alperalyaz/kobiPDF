@@ -16,6 +16,8 @@ const VERSION = __APP_VERSION__
 const REPO_URL = 'https://github.com/alperalyaz/kobiPDF'
 const ISSUES_URL = `${REPO_URL}/issues`
 const WEBSITE_URL = 'https://www.hidroteknik.si'
+/** Also given to Google Play and the Microsoft Store; Play requires a link inside the app too. */
+const PRIVACY_URL = `${REPO_URL}/blob/main/PRIVACY.md`
 
 type TabId = 'general' | 'howto' | 'shortcuts' | 'faq' | 'company'
 
@@ -161,6 +163,7 @@ export function AboutDialog({ onClose }: { onClose: () => void }): JSX.Element {
                 <ExternalLinkRow href={REPO_URL} label={t('about.links.repo')} detail="github.com/alperalyaz/kobiPDF" />
                 <ExternalLinkRow href={ISSUES_URL} label={t('about.links.issues')} detail={t('about.links.issuesDetail')} />
                 <ExternalLinkRow href={WEBSITE_URL} label={t('about.links.website')} detail="www.hidroteknik.si" />
+                <ExternalLinkRow href={PRIVACY_URL} label={t('about.links.privacy')} detail={t('about.links.privacyDetail')} />
                 {window.api.platform === 'win32' && (
                   <button
                     type="button"
