@@ -52,6 +52,14 @@
         </provider>
     </application>
 
+    <!-- DefaultPdfPlugin.status(): on Android 11+ other apps' PDF viewers are invisible without this. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="application/pdf" />
+        </intent>
+    </queries>
+
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />

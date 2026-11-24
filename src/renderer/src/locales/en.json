@@ -127,7 +127,7 @@
         },
         "default": {
           "q": "How do I make PDFs open in kobiPDF when I tap them?",
-          "a": "When you tap a PDF, pick kobiPDF from the list and choose \"Always\". If you picked another app before, clear \"Open by default\" on that app's page under Settings > Apps."
+          "a": "kobiPDF asks you on its welcome screen: tap \"Pick kobiPDF\", choose kobiPDF in the list and tap \"Always\". You can also do this later from \"Open PDFs with kobiPDF\" in About > General. If a file manager opens a PDF in its own viewer, long-press the file and use ⋮ > Open with to pick kobiPDF."
         },
         "scanned": {
           "q": "Why can't I edit the text on a scanned page?",
@@ -156,7 +156,21 @@
     "addHint": "Tap the page to add text",
     "drawSignature": "Draw a signature",
     "uploadStamp": "Upload a stamp or signature image",
-    "language": "Language"
+    "language": "Language",
+    "defaultPdf": {
+      "noneTitle": "Open PDFs with kobiPDF?",
+      "noneBody": "In the list that opens, pick kobiPDF and tap \"Always\". From then on, PDFs you tap open straight in kobiPDF.",
+      "otherTitle": "PDFs now open with {{app}}",
+      "otherBody": "On the page that opens, go to \"Open by default\" and tap \"Clear defaults\", then come back here.",
+      "choose": "Pick kobiPDF",
+      "openSettings": "Open settings",
+      "done": "Done, PDFs will now open in kobiPDF.",
+      "aboutRow": "Open PDFs with kobiPDF",
+      "aboutDefault": "kobiPDF is the default PDF app",
+      "aboutOther": "Currently opens with {{app}}",
+      "aboutNone": "The phone asks every time",
+      "onlyOnce": "kobiPDF was picked this time. To always open PDFs in kobiPDF, tap \"Always\" in the list."
+    }
   },
   "defaultApp": {
     "message": "kobiPDF is not your default PDF app. Open PDFs in kobiPDF when you double-click them? In the Windows settings that open, choose kobiPDF for .pdf.",

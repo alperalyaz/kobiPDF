@@ -86,6 +86,12 @@ export interface PrintRequest {
   copies: number
 }
 
+export interface PdfHandler {
+  state: 'default' | 'other' | 'none'
+  label?: string
+  packageName?: string
+}
+
 export interface KobiPdfApi {
   platform: string
   openFile: () => Promise<Result<OpenedFile>>
@@ -109,6 +115,14 @@ export interface KobiPdfApi {
   onOpenExternalFile: (callback: (path: string) => void) => () => void
   /** Opens the system share sheet for a saved file. Android only. */
   shareFile?: (path: string) => Promise<void>
+  /** Android: which app opens PDFs now ("none" = the system asks every time). */
+  pdfHandler?: () => Promise<PdfHandler>
+  /** Android: opens a small PDF so the system's "Open with" sheet appears (pick kobiPDF + Always). */
+  choosePdfHandler?: () => Promise<void>
+  /** Android: opens the settings page of the given app, where its "Open by default" can be cleared. */
+  openAppSettings?: (packageName: string) => Promise<void>
+  /** Android: called when the app comes back to the front, or kobiPDF was picked in the "Open with" sheet. */
+  onPdfHandlerChange?: (cb: (chosen: boolean) => void) => () => void
   /**
    * Android: the newest PDF another app handed over ("Open with", "Share"), taken off the queue; null when
    * none waits. onOpenExternalFile only signals that one arrived.

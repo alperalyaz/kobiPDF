@@ -1,6 +1,6 @@
 import { useState, type KeyboardEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Building2, ExternalLink, HelpCircle, Info, Keyboard, ListOrdered } from 'lucide-react'
+import { Building2, Check, ExternalLink, HelpCircle, Info, Keyboard, ListOrdered } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import arimoLicense from '@expo-google-fonts/arimo/LICENSE_FONT?raw'
 import tinosLicense from '@expo-google-fonts/tinos/LICENSE_FONT?raw'
@@ -11,6 +11,7 @@ import logoFull from '../../assets/logo-full.svg'
 import { actions, type ActionDef } from '../../actions/actions'
 import { formatShortcut } from '../common/ActionButton'
 import { DialogButton, Modal } from './Modal'
+import { takePdfHandlerStep, usePdfHandler } from '../phone/DefaultPdfCard'
 
 const VERSION = __APP_VERSION__
 const REPO_URL = 'https://github.com/alperalyaz/kobiPDF'
@@ -108,6 +109,7 @@ export function AboutDialog({ onClose }: { onClose: () => void }): JSX.Element {
   // On the phone the tabs sit in a scrolling row above the content, and keyboard shortcuts are left out.
   const phone = __ANDROID__
   const tabs = phone ? TABS.filter((item) => item.id !== 'shortcuts') : TABS
+  const pdfHandler = usePdfHandler()
   const howtoSteps = phone ? PHONE_HOWTO_STEPS : HOWTO_STEPS
   // Phone wording lives under about.phone.*; anything not rewritten there uses the desktop text.
   const tx = (key: string): string =>
@@ -186,6 +188,30 @@ export function AboutDialog({ onClose }: { onClose: () => void }): JSX.Element {
                 <ExternalLinkRow href={ISSUES_URL} label={t('about.links.issues')} detail={t('about.links.issuesDetail')} />
                 <ExternalLinkRow href={WEBSITE_URL} label={t('about.links.website')} detail="www.hidroteknik.si" />
                 <ExternalLinkRow href={PRIVACY_URL} label={t('about.links.privacy')} detail={t('about.links.privacyDetail')} />
+                {phone && pdfHandler && (
+                  <button
+                    type="button"
+                    disabled={pdfHandler.state === 'default'}
+                    onClick={() => takePdfHandlerStep(pdfHandler)}
+                    className="flex items-center justify-between rounded border border-chrome-border px-3 py-2 text-left hover:bg-chrome disabled:hover:bg-transparent"
+                  >
+                    <span>
+                      <span className="block font-medium text-ink">{t('phone.defaultPdf.aboutRow')}</span>
+                      <span className="block text-[11px] text-ink-muted">
+                        {pdfHandler.state === 'default'
+                          ? t('phone.defaultPdf.aboutDefault')
+                          : pdfHandler.state === 'other'
+                            ? t('phone.defaultPdf.aboutOther', { app: pdfHandler.label })
+                            : t('phone.defaultPdf.aboutNone')}
+                      </span>
+                    </span>
+                    {pdfHandler.state === 'default' ? (
+                      <Check size={14} className="shrink-0 text-brand" />
+                    ) : (
+                      <ExternalLink size={14} className="shrink-0 text-brand" />
+                    )}
+                  </button>
+                )}
                 {window.api.platform === 'win32' && (
                   <button
                     type="button"

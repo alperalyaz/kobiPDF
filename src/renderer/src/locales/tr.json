@@ -127,7 +127,7 @@
         },
         "default": {
           "q": "PDF'lere dokununca kobiPDF'te nasıl açarım?",
-          "a": "Bir PDF'e dokunduğunuzda çıkan listeden kobiPDF'i seçip \"Her zaman\" deyin. Daha önce başka bir uygulama seçtiyseniz o uygulamanın Ayarlar > Uygulamalar sayfasından \"Varsayılan olarak aç\" ayarını temizleyin."
+          "a": "kobiPDF karşılama ekranında size sorar: \"kobiPDF'i seç\"e dokunup listeden kobiPDF'i seçin ve \"Her zaman\" deyin. Bunu daha sonra Hakkında > Genel'deki \"PDF'leri kobiPDF ile aç\" satırından da yapabilirsiniz. Dosya yöneticisi bir PDF'i kendi içinde açıyorsa, dosyaya basılı tutup ⋮ > Birlikte aç ile kobiPDF'i seçin."
         },
         "scanned": {
           "q": "Taranmış bir sayfadaki yazıyı neden düzenleyemiyorum?",
@@ -156,7 +156,21 @@
     "addHint": "Yazı eklemek için sayfaya dokunun",
     "drawSignature": "İmza çiz",
     "uploadStamp": "Kaşe veya imza resmi yükle",
-    "language": "Dil"
+    "language": "Dil",
+    "defaultPdf": {
+      "noneTitle": "PDF'ler kobiPDF ile açılsın mı?",
+      "noneBody": "Açılan listede kobiPDF'i seçip \"Her zaman\"a dokunun. Bundan sonra dokunduğunuz PDF'ler doğrudan kobiPDF'te açılır.",
+      "otherTitle": "PDF'ler şu an {{app}} ile açılıyor",
+      "otherBody": "Açılan sayfada \"Varsayılan olarak aç\"a girip \"Varsayılanları temizle\"ye dokunun, sonra buraya dönün.",
+      "choose": "kobiPDF'i seç",
+      "openSettings": "Ayarları aç",
+      "done": "Tamam, PDF'ler artık kobiPDF ile açılacak.",
+      "aboutRow": "PDF'leri kobiPDF ile aç",
+      "aboutDefault": "kobiPDF şu an varsayılan PDF uygulaması",
+      "aboutOther": "Şu an {{app}} ile açılıyor",
+      "aboutNone": "Telefon her seferinde soruyor",
+      "onlyOnce": "kobiPDF bu sefer seçildi. PDF'lerin hep kobiPDF'te açılması için listede \"Her zaman\"a dokunun."
+    }
   },
   "defaultApp": {
     "message": "kobiPDF şu an varsayılan PDF programınız değil. PDF dosyaları çift tıklanınca kobiPDF'te açılsın mı? Açılan Windows ayarlarında .pdf için kobiPDF'i seçin.",

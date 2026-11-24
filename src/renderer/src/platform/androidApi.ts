@@ -7,7 +7,7 @@ import { App } from '@capacitor/app'
 import { Capacitor, registerPlugin, type PluginListenerHandle } from '@capacitor/core'
 import { Directory, Filesystem } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
-import type { FileErrorCode, KobiPdfApi, OpenedFile, OpenedImage, Result, SavedFile } from '../../../shared/ipc'
+import type { FileErrorCode, KobiPdfApi, OpenedFile, OpenedImage, PdfHandler, Result, SavedFile } from '../../../shared/ipc'
 import i18n from '../locales/i18n'
 import { runBack } from './back'
 
@@ -203,6 +203,22 @@ async function readIncoming(id: string, name: string): Promise<Result<OpenedFile
   }
 }
 
+// ---------- default PDF app ----------
+
+interface DefaultPdfPluginApi {
+  status(): Promise<PdfHandler>
+  choose(): Promise<void>
+  openSettings(options: { packageName: string }): Promise<void>
+  addListener(event: 'chosen', listener: () => void): Promise<PluginListenerHandle>
+}
+
+/** Native side: android/app/src/main/java/com/hidroteknik/kobipdf/DefaultPdfPlugin.java. */
+const DefaultPdf = registerPlugin<DefaultPdfPluginApi>('DefaultPdf')
+const handlerListeners = new Set<(chosen: boolean) => void>()
+void DefaultPdf.addListener('chosen', () => handlerListeners.forEach((cb) => cb(true)))
+// The "Open with" sheet and the settings page cover the app; it is checked again when it comes back.
+void App.addListener('resume', () => handlerListeners.forEach((cb) => cb(false)))
+
 // ---------- back button ----------
 
 let dirty = false
@@ -300,6 +316,13 @@ const androidApi: KobiPdfApi = {
   },
   readIncomingFile: readIncoming,
 
+  pdfHandler: () => DefaultPdf.status(),
+  choosePdfHandler: () => DefaultPdf.choose(),
+  openAppSettings: (packageName) => DefaultPdf.openSettings({ packageName }),
+  onPdfHandlerChange: (cb) => {
+    handlerListeners.add(cb)
+    return () => handlerListeners.delete(cb)
+  },
   shareFile: async (path) => {
     try {
       const { uri } = await Filesystem.getUri({ path, directory: DIR })

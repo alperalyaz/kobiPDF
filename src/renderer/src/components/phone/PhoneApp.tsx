@@ -29,6 +29,7 @@ import { AboutDialog } from '../dialogs/AboutDialog'
 import { DialogHost } from '../dialogs/DialogHost'
 import { BusyOverlay } from '../layout/BusyOverlay'
 import { NoticeBar } from '../layout/NoticeBar'
+import { DefaultPdfCard } from './DefaultPdfCard'
 import { PropertiesBar } from '../layout/PropertiesBar'
 import { EmptyState } from '../viewer/EmptyState'
 import { PdfViewer } from '../viewer/PdfViewer'
@@ -297,7 +298,16 @@ export function PhoneApp(): JSX.Element {
       </header>
 
       <main className="relative min-h-0 flex-1">
-        {doc ? <PdfViewer key={activeDocumentId ?? doc.name} doc={doc} /> : <EmptyState />}
+        {doc ? (
+          <PdfViewer key={activeDocumentId ?? doc.name} doc={doc} />
+        ) : (
+          <div className="flex h-full flex-col">
+            <DefaultPdfCard />
+            <div className="relative min-h-0 flex-1">
+              <EmptyState />
+            </div>
+          </div>
+        )}
         {!keyboardOpen && <PageIndicator />}
         <NoticeBar />
       </main>
