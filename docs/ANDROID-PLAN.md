@@ -201,6 +201,8 @@ bellek ölçülmedi (12 DejaVu + 20 ikiz yüz açılışta yükleniyor); Helveti
 başvurusu. Testçiler PrimeTestLab'den (primetestlab.com, Enterprise 25 testçi, 29,49 $; önceki siparişler Megafon vb.).
 Sipariş sonrası: paneldeki adresleri kapalı test e-posta listesine ekle, test bağlantısını panele gir.
 
+**Durum (2026-11-24):** kapalı test incelemesi geçti, 0.5.0 (50000) kapalı test kanalında yayında.
+
 **Açık kalanlar:** PrimeTestLab ödemesi (kullanıcı); testçi listesinin eklenmesi; 14 gün sonra üretim başvurusu; Play'den
 kurulan imzalı sürümün telefonda denenmesi (dahili test bağlantısı); İngilizce sayfaya İngilizce ekran görüntüleri.
 
