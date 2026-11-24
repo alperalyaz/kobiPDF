@@ -339,7 +339,7 @@ export function SignatureDialog(): JSX.Element {
           }}
         />
         </div>
-        <span className="text-ink-muted">{t('dialogs.signature.hint')}</span>
+        <span className="text-ink-muted">{t(__ANDROID__ ? 'dialogs.signature.hintTouch' : 'dialogs.signature.hint')}</span>
       </div>
     </Modal>
   )

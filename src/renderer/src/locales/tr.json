@@ -289,6 +289,7 @@
       "clear": "Temizle",
       "upload": "Resim yükle",
       "hint": "Fare veya kalemle çizin ya da kaşe ve imza resmi yükleyin. Şeffaf PNG belgede de şeffaf kalır. Yerleştirdikleriniz bir dahaki sefere yukarıdaki listede durur.",
+      "hintTouch": "Parmağınızla çizin ya da kaşe ve imza resmi yükleyin. Şeffaf PNG belgede de şeffaf kalır. Yerleştirdikleriniz bir dahaki sefere yukarıdaki listede durur.",
       "saved": "Kayıtlı imza ve kaşeler (tıklayınca yerleşir)",
       "remove": "Listeden sil"
     }
