@@ -269,7 +269,10 @@ export function PhoneApp(): JSX.Element {
 
   return (
     <div className="flex h-full flex-col bg-workspace">
-      <header className="flex h-14 shrink-0 items-center gap-0.5 border-b border-chrome-border bg-white pl-3 pr-1">
+      {/* While typing, the keyboard needs the room (in landscape nothing else would fit); Done is in the context bar. */}
+      <header
+        className={`h-14 shrink-0 items-center gap-0.5 border-b border-chrome-border bg-white pl-3 pr-1 ${keyboardOpen ? 'hidden' : 'flex'}`}
+      >
         <img src={logo} alt="" className="size-7 shrink-0" draggable={false} />
         <div className="min-w-0 flex-1 truncate pl-2 text-[15px] font-semibold text-ink">
           {doc ? (
@@ -295,7 +298,7 @@ export function PhoneApp(): JSX.Element {
 
       <main className="relative min-h-0 flex-1">
         {doc ? <PdfViewer key={activeDocumentId ?? doc.name} doc={doc} /> : <EmptyState />}
-        <PageIndicator />
+        {!keyboardOpen && <PageIndicator />}
         <NoticeBar />
       </main>
 

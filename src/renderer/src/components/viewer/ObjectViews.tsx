@@ -35,7 +35,10 @@ export function textCss(style: TextStyle, zoom: number): CSSProperties {
     fontStyle: style.italic ? 'italic' : 'normal',
     lineHeight: `${lineHeight(style) * zoom}px`,
     color: style.color,
-    textAlign: style.align
+    textAlign: style.align,
+    // The saved PDF has no kerning or ligatures; show the text the same way.
+    fontKerning: 'none',
+    fontVariantLigatures: 'none'
   }
 }
 

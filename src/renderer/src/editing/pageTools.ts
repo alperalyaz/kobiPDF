@@ -1,7 +1,7 @@
 import { useAppStore, type PageSize, type ToolId } from '../store/useAppStore'
 import { useEditStore } from '../store/useEditStore'
 import { commitDraft, nextDraftToken } from './draft'
-import { measureText, usableFont } from './fonts'
+import { faceMetrics, measureText, usableFont, whenFontReady } from './fonts'
 import { fontAt } from './pdfFonts'
 import { boundsOfPoints, clientToPage, rgbToHex, rotateVector } from './geometry'
 import { changeObjects } from './history'
@@ -223,28 +223,8 @@ function fontFromPdfName(pdfName: string): { font: FontFamily; bold: boolean; it
   }
 }
 
-/** Ascent and descent (em fractions) of each face, for placing the baseline. */
-function fontMetrics(font: FontFamily): { ascent: number; descent: number } {
-  switch (font) {
-    case 'sans':
-    case 'mono':
-      return { ascent: 0.928, descent: 0.236 }
-    case 'serif':
-      return { ascent: 0.939, descent: 0.236 }
-    case 'times':
-      return { ascent: 0.891, descent: 0.216 }
-    case 'courier':
-      return { ascent: 0.833, descent: 0.3 }
-    case 'calibri':
-      return { ascent: 0.75, descent: 0.25 }
-    case 'tahoma':
-      return { ascent: 1.0, descent: 0.207 }
-    case 'verdana':
-      return { ascent: 1.005, descent: 0.21 }
-    default:
-      return { ascent: 0.905, descent: 0.212 }
-  }
-}
+/** Ascent and descent (em fractions) of the face actually drawn (a twin may differ from the real font). */
+const fontMetrics = faceMetrics
 
 /** "Edit Text": replaces a text run on the page through an editable box. */
 export function editPageText(span: HTMLElement, pageIndex: number): void {
@@ -320,10 +300,17 @@ export function editPageText(span: HTMLElement, pageIndex: number): void {
     token
   })
 
+  // A face that is not loaded yet measures with a stand-in: re-measure once it is ready.
+  void whenFontReady(style).then(() => {
+    const draft = useEditStore.getState().draft
+    if (!draft || draft.token !== token || draft.style.font !== style.font) return
+    useEditStore.getState().updateDraft(placement(draft.style.font, draft.style, draft.text))
+  })
+
   // Switch to the original typeface once it is known (MuPDF loads on first use).
   if (!Number.isFinite(baseline) || !Number.isFinite(pdfX)) return
-  void fontAt(doc.bytes, pageIndex, size, pdfX, baseline).then((runFont) => {
-    const draft = useEditStore.getState().draft
+  void fontAt(doc.bytes, pageIndex, size, pdfX, baseline).then(async (runFont) => {
+    let draft = useEditStore.getState().draft
     if (!runFont || !draft || draft.token !== token) return
     const match = fontFromPdfName(runFont.name)
     const font = usableFont(match?.font ?? draft.style.font)
@@ -333,6 +320,9 @@ export function editPageText(span: HTMLElement, pageIndex: number): void {
       bold: runFont.bold || Boolean(match?.bold),
       italic: runFont.italic || Boolean(match?.italic)
     }
+    await whenFontReady(next)
+    draft = useEditStore.getState().draft
+    if (!draft || draft.token !== token) return
     useEditStore.getState().updateDraft({ style: next, ...placement(font, next, draft.text) })
   })
 }

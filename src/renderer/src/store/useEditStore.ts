@@ -44,7 +44,8 @@ const COALESCE_MS = 1500
 const EMPTY: EditObject[] = []
 
 const defaultSettings: ToolSettings = {
-  text: { font: 'sans', size: 14, color: '#1f2937', bold: false, italic: false, align: 'left' as TextAlign },
+  // Arial: the real font on Windows, its metric twin Arimo elsewhere (fonts.ts).
+  text: { font: 'arial', size: 14, color: '#1f2937', bold: false, italic: false, align: 'left' as TextAlign },
   comment: { fill: '#fff8c5', border: '#d4a72c' },
   markup: {
     highlight: { color: '#ffd400', opacity: 0.55, width: 18 },

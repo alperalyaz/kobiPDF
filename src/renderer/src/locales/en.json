@@ -91,7 +91,8 @@
       "body": "Hidroteknik develops kobiPDF and releases it free of charge so small businesses have the PDF tools they need every day.",
       "licenseTitle": "License",
       "license": "kobiPDF is free software distributed under the GNU Affero General Public License version 3 (AGPL-3.0). You may use, study, modify and share it under the same license.",
-      "thirdParty": "Open-source components"
+      "thirdParty": "Open-source components",
+      "fontLicenses": "Font license texts"
     }
   },
   "android": {

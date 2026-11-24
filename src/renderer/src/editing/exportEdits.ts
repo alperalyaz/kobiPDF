@@ -14,7 +14,7 @@ import {
   type PDFPage
 } from 'pdf-lib'
 import type { PageSize } from '../store/useAppStore'
-import { getFontBytes, layoutLines, lineHeight } from './fonts'
+import { fallbackFamily, getFontBytes, layoutLines, lineHeight } from './fonts'
 import { markupLineWidth } from './layout'
 import { eraseText } from './eraseText'
 import { hexToRgb } from './geometry'
@@ -51,6 +51,29 @@ function embedFont(ctx: Context, style: TextStyle): Promise<PDFFont> {
     ctx.fonts.set(key, font)
   }
   return font
+}
+
+/** True when the embedded face has a glyph for every visible character of `text`. */
+function coversText(font: PDFFont, text: string): boolean {
+  const face = (font as unknown as { embedder?: { font?: { hasGlyphForCodePoint?: (cp: number) => boolean } } })
+    .embedder?.font
+  if (!face?.hasGlyphForCodePoint) return true
+  for (const ch of text) {
+    if (/\s/.test(ch)) continue
+    if (!face.hasGlyphForCodePoint(ch.codePointAt(0) ?? 0)) return false
+  }
+  return true
+}
+
+/**
+ * The face for `style`, or its bundled fallback (DejaVu, wide coverage) when a character is missing:
+ * pdf-lib would otherwise save an empty box for it (e.g. ₺ in Carlito or Cousine).
+ */
+async function fontWithAllGlyphs(ctx: Context, style: TextStyle, text: string): Promise<PDFFont> {
+  const font = await embedFont(ctx, style)
+  const fallback = fallbackFamily(style.font)
+  if (!fallback || coversText(font, text)) return font
+  return embedFont(ctx, { ...style, font: fallback })
 }
 
 function embedImage(ctx: Context, obj: ImageObject): Promise<PDFImage> {
@@ -96,7 +119,7 @@ async function drawTextLike(ctx: Context, page: PDFPage, info: PageSize, obj: Te
   const lines = layoutLines(obj.text, obj.style, innerWidth)
   const lh = lineHeight(obj.style)
   const height = Math.max(1, lines.length) * lh + padding * 2
-  const font = await embedFont(ctx, obj.style)
+  const font = await fontWithAllGlyphs(ctx, obj.style, obj.text)
 
   if (obj.kind === 'text' && obj.cover && !ctx.textErased) {
     const { x, y } = toUser(info, obj.cover.x, obj.cover.y + obj.cover.height)

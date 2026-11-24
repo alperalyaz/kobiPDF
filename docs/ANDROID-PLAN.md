@@ -1,7 +1,7 @@
 # kobiPDF Android planı (Capacitor, aynı repo)
 
-Durum: Adım 0, 1 ve 2 tamamlandı (24.11.2026; Adım 1 `bekleyen/android-adim1`, Adım 2 `bekleyen/android-adim2` dalı,
-adım 2 adım 1'in üstüne kurulu); Adım 3 `bekleyen/android-adim3` (adım 2'nin üstüne). Sıradaki: Adım 4 (yazı tipleri).
+Durum: Adım 0-4 tamamlandı (24.11.2026). Dallar zincir halinde: `bekleyen/android-adim1` -> `adim2` -> `adim3` ->
+`adim4` (her biri bir öncekinin üstünde). Sıradaki: Adım 5 (yayın).
 Plan eleştirisinden geçti; bulgular aşağıya işlendi.
 
 ## Derleme (Windows, USB ile bağlı telefon)
@@ -150,10 +150,35 @@ kaydedilen dosyalar MediaStore'da (Dosyalar uygulamasında) görünüyor.
   Windows gerçek Arial'ı kullanmaya devam eder.
 - Bilinen sınır: Tahoma, Calibri, Verdana, Segoe'nin ücretsiz ölçü ikizi yok; Android'de DejaVu'ya düşer, yeni yazı biraz geniş görünür.
 
+**Yapılan (plan eleştirisinden sonra; Liberation npm'de yok, aynı ölçülü Google yazı tipleri kullanıldı):**
+- Ölçü ikizleri (SIL OFL 1.1, `@expo-google-fonts/*`, tam sürüm): Arial -> Arimo, Times New Roman -> Tinos,
+  Courier New -> Cousine, **Calibri -> Carlito, Georgia -> Gelasio** (plan Calibri'nin ikizi yok diyordu; yanlıştı).
+  fontkit ölçümü: Türkçe örnek cümlede genişlik farkı beşinde de %0,000; ğüşıöçĞÜŞİÖÇ var; Carlito ve Cousine'de ₺ yok.
+  Yalnız 400/700 düz ve italik dosyalar (20 dosya). Tahoma, Verdana, Segoe, Consolas vb. için ikiz yok: DejaVu.
+- `fonts.ts`: aile başına tek kaynak; sistemde gerçek yazı tipi varsa o (Windows), yoksa ikizi, o da yoksa DejaVu.
+  Seçim listesinde "Calibri (Carlito)" gibi görünür. İkizler CSS url() ile yüklenir (JS'te bayt kopyası tutulmaz).
+  Taban çizgisi için ascent/descent çizilen yüzden alınır (Carlito 0,952/0,269, Calibri 0,75/0,25).
+- Yarış: yazı tipi yüklenmeden ölçülürse kutu yanlış genişlikte kalıyordu; `whenFontReady` ile yüklenince yeniden ölçülür.
+- Harf aralığı (kerning) ve bitişik harfler ekranda ve ölçümde kapalı: pdf-lib kaydederken uygulamıyor, böylece ekran = PDF.
+  (Masaüstünü de etkiler: kerning'li çiftlerde yeni yazı çok az geniş görünür, ama kayıtla aynıdır.)
+- Kaydederken yazı tipinde olmayan bir karakter (ör. Carlito'da ₺) varsa o yazı DejaVu ile gömülür; yoksa PDF'te boş
+  kutu çıkıyordu. Bu durumda kaydedilen satır ekrandakinden biraz geniş olabilir.
+- Yeni metnin varsayılan yazı tipi Arial (Windows'ta gerçek Arial, telefonda Arimo); önceden DejaVu Sans'tı.
+- Hakkında: Capacitor ve AndroidX (Android), Electron (masaüstü), ikiz yazı tipleri ve tam OFL metinleri (açılır bölüm).
+- Telefonda klavye açıkken üst çubuk ve sayfa numarası gizlenir (yatay ekranda başka yer kalmıyordu).
+
+**Telefonda denenen:** 1mb.pdf'teki Calibri Bold başlık "Calibri (Carlito)" olarak tanındı; düzeltilen satır 263 px,
+orijinal 263 px (önce DejaVu ile sayfadan taşıyordu). ₺'li satır kaydedilince DejaVuSans-Bold ile gömüldü, "fiyat"
+kelimesi PDF'te doğru okunuyor, sayfanın geri kalanı orijinal Calibri. Yatay ekranda arayüz ve belge korunuyor.
+Masaüstünde her aile için tek kaynak (4 yüz) kayıtlı. APK 19,5 MB.
+
+**Açık kalanlar:** Windows'ta elle: yeni metin Arial, kaydedilen PDF'te gerçek Arial adı; telefonda açılış süresi /
+bellek ölçülmedi (12 DejaVu + 20 ikiz yüz açılışta yükleniyor); Helvetica (gömülü olmayan) bir PDF'te deneme.
+
 ## Adım 5 - Yayın
 - İmzalı AAB GitHub Actions'ta üretilir. İmza anahtarı ve parolaları GitHub Secrets'ta durur, repoya ASLA girmez
   (`.gitignore`: `*.jks`, `*.keystore`, `keystore.properties`; derlemede kontrol).
-- Hakkında penceresindeki lisans listesine Capacitor ve Liberation eklenir.
+- Hakkında penceresindeki lisans listesi: yapıldı (Adım 4).
 - Play: güncel hedef API seviyesi, tanıtım metni, gizlilik sayfası (hidroteknik.si/gizlilik/kobipdf).
 
 ## Çalışma düzeni

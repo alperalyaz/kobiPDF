@@ -2,6 +2,11 @@ import { useState, type KeyboardEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Building2, ExternalLink, HelpCircle, Info, Keyboard, ListOrdered } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import arimoLicense from '@expo-google-fonts/arimo/LICENSE_FONT?raw'
+import tinosLicense from '@expo-google-fonts/tinos/LICENSE_FONT?raw'
+import cousineLicense from '@expo-google-fonts/cousine/LICENSE_FONT?raw'
+import carlitoLicense from '@expo-google-fonts/carlito/LICENSE_FONT?raw'
+import gelasioLicense from '@expo-google-fonts/gelasio/LICENSE_FONT?raw'
 import logoFull from '../../assets/logo-full.svg'
 import { actions, type ActionDef } from '../../actions/actions'
 import { formatShortcut } from '../common/ActionButton'
@@ -22,17 +27,26 @@ const TABS: { id: TabId; icon: LucideIcon }[] = [
   { id: 'company', icon: Building2 }
 ]
 
-const HOWTO_STEPS = ['open', 'navigate', 'text', 'markup', 'signature', 'pages', 'save'] as const
+/** Full license texts of the bundled stand-in fonts (copyright line + SIL OFL 1.1). */
+const FONT_LICENSES = [arimoLicense, tinosLicense, cousineLicense, carlitoLicense, gelasioLicense]
+
+const HOWTO_STEPS =['open', 'navigate', 'text', 'markup', 'signature', 'pages', 'save'] as const
 const FAQ_ITEMS = ['free', 'offline', 'default', 'scanned', 'encrypted', 'undo', 'bug'] as const
 
 /** Third-party components shipped inside the app, with their licenses. */
 const THIRD_PARTY: [name: string, license: string][] = [
-  ['Electron', 'MIT'],
+  ...((__ANDROID__
+    ? [
+        ['Capacitor', 'MIT'],
+        ['AndroidX', 'Apache-2.0']
+      ]
+    : [['Electron', 'MIT']]) as [string, string][]),
   ['React', 'MIT'],
   ['PDF.js (pdfjs-dist)', 'Apache-2.0'],
   ['pdf-lib, @pdf-lib/fontkit', 'MIT'],
   ['MuPDF.js', 'AGPL-3.0'],
   ['DejaVu Fonts', 'Bitstream Vera / Public Domain'],
+  ['Arimo, Tinos, Cousine, Carlito, Gelasio', 'SIL OFL 1.1'],
   ['Lucide Icons', 'ISC'],
   ['i18next, react-i18next', 'MIT'],
   ['Zustand', 'MIT']
@@ -240,6 +254,15 @@ export function AboutDialog({ onClose }: { onClose: () => void }): JSX.Element {
                     ))}
                   </tbody>
                 </table>
+                {/* SIL OFL 1.1 asks for the copyright notice and license text to travel with the fonts. */}
+                <details className="mt-2">
+                  <summary className="cursor-pointer text-brand">{t('about.company.fontLicenses')}</summary>
+                  {FONT_LICENSES.map((text, i) => (
+                    <pre key={i} className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap rounded bg-chrome p-2 text-[10px] leading-snug">
+                      {text}
+                    </pre>
+                  ))}
+                </details>
               </Section>
             </>
           )}
