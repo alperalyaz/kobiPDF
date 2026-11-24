@@ -11,7 +11,8 @@ Yok: vurgulama, kalem, sayfa işlemleri, yazdırma, sekmeler, varsayılan uygula
 ## Adım 0 - Deneme (karar noktası, önce bu)
 En büyük belirsizlik MuPDF'in (WebAssembly, yaklaşık 10 MB) telefondaki WebView içinde çalışıp çalışmadığı ve bellek.
 - Ayrı bir deneme dalında boş bir Capacitor uygulaması: pdf.js ile aç, `eraseText` ile bir yazıyı sil, pdf-lib ile kaydet.
-- Bulutta Android SDK yok: debug APK, GitHub Actions ile derlenir, telefona kurulur.
+- Derleme ve deneme YEREL oturumda yapılır: kullanıcının Windows bilgisayarı, USB ile bağlı Android telefon
+  (`npx cap run android`, hata kayıtları `adb logcat`). Bulut oturumu Android derleyemez; kodu hazırlayıp dala koyar.
 - Ölçülecekler: 1 MB, 10 MB ve 50 MB PDF ile çalışıyor mu, ne kadar sürüyor, çöküyor mu; en düşük Android / WebView sürümü;
   Capacitor köprüsünün CSP'den ne istediği.
 - Sonuç kötüyse: kapsam "yalnız imza / kaşe" (MuPDF'siz, pdf-lib ile) olur ya da Android iptal edilir.
@@ -50,4 +51,5 @@ En büyük belirsizlik MuPDF'in (WebAssembly, yaklaşık 10 MB) telefondaki WebV
 - Play: güncel hedef API seviyesi, tanıtım metni, gizlilik sayfası (hidroteknik.si/gizlilik/kobipdf).
 
 ## Çalışma düzeni
+Telefonda deneme gereken her adım (0, 2, 3, 5) yerel oturumda, USB bağlı telefonla yapılır.
 Her adım kendi `bekleyen/<konu>` dalında. Masaüstüne dokunan değişiklik (Adım 1, 2, 4) yayından önce Windows'ta elle denenir.
