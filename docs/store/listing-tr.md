@@ -71,6 +71,11 @@ KOBİ
 - Destek: https://github.com/alperalyaz/kobiPDF/issues
 - Gizlilik politikası: https://github.com/alperalyaz/kobiPDF/blob/main/PRIVACY.md
 
+## Store bilgileri
+- Store kimliği: 9NJVFT7MHLGP
+- Store bağlantısı: https://apps.microsoft.com/detail/9NJVFT7MHLGP
+- Görseller: store-logo-1080.png (1:1 kutu), app-tile-300.png (uygulama simgesi), poster-720x1080.png (9:16 poster)
+
 ## Ekran görüntüleri (sırasıyla, screenshots/tr-*.png, 1920×1080)
 1. tr-1-view.png — PDF'leri hızlıca açın ve okuyun
 2. tr-2-edit.png — Belgedeki yazıyı doğrudan düzeltin

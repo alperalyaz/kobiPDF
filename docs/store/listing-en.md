@@ -71,6 +71,11 @@ small business
 - Support: https://github.com/alperalyaz/kobiPDF/issues
 - Privacy policy: https://github.com/alperalyaz/kobiPDF/blob/main/PRIVACY.md
 
+## Store details
+- Store ID: 9NJVFT7MHLGP
+- Store link: https://apps.microsoft.com/detail/9NJVFT7MHLGP
+- Images: store-logo-1080.png (1:1 box art), app-tile-300.png (app tile), poster-720x1080.png (9:16 poster)
+
 ## Screenshots (in order, screenshots/en-*.png, 1920×1080)
 1. en-1-view.png — Open and read PDFs fast
 2. en-2-edit.png — Fix text right in the document
