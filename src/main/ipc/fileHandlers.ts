@@ -1,5 +1,15 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { basename, join, resolve } from 'node:path'
+
+/**
+ * File name for display. Names made on a Mac or by some apps store letters
+ * such as İ, Ş, Ö as a base letter plus a separate mark ("I" + dot), which the
+ * interface font draws as a box. NFC joins them back into single letters.
+ * Only the shown name changes; the path on disk is kept as it is.
+ */
+function displayName(path: string): string {
+  return basename(path).normalize('NFC')
+}
 import { BrowserWindow, dialog, ipcMain } from 'electron'
 import {
   IpcChannels,
@@ -63,7 +73,7 @@ async function readPdf(path: string): Promise<Result<OpenedFile>> {
   try {
     const data = new Uint8Array(await readFile(path))
     if (!looksLikePdf(data)) return fail('CORRUPT')
-    return { ok: true, value: { path, name: basename(path), data } }
+    return { ok: true, value: { path, name: displayName(path), data } }
   } catch (err) {
     return fail(toErrorCode(err), err)
   }
@@ -72,7 +82,7 @@ async function readPdf(path: string): Promise<Result<OpenedFile>> {
 async function writePdf(path: string, data: Uint8Array): Promise<Result<SavedFile>> {
   try {
     await writeFile(path, data)
-    return { ok: true, value: { path, name: basename(path) } }
+    return { ok: true, value: { path, name: displayName(path) } }
   } catch (err) {
     return fail(toErrorCode(err), err)
   }
@@ -113,7 +123,7 @@ export function registerFileHandlers(): void {
     const files: OpenedFile[] = []
     for (const path of paths) {
       const result = await readPdf(approvePath(path))
-      if (!result.ok) return { ...result, message: basename(path) }
+      if (!result.ok) return { ...result, message: displayName(path) }
       files.push(result.value)
     }
     return { ok: true, value: files }
@@ -129,7 +139,7 @@ export function registerFileHandlers(): void {
       const data = new Uint8Array(await readFile(path))
       const format = imageFormat(data)
       if (!format) return fail('UNSUPPORTED_IMAGE')
-      return { ok: true, value: { name: basename(path), data, format } }
+      return { ok: true, value: { name: displayName(path), data, format } }
     } catch (err) {
       return fail(toErrorCode(err), err)
     }
