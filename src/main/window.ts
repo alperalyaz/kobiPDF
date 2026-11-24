@@ -34,7 +34,10 @@ export function createMainWindow(): BrowserWindow {
     }
   })
 
-  win.once('ready-to-show', () => win.show())
+  win.once('ready-to-show', () => {
+    win.maximize()
+    win.show()
+  })
 
   // External links never open inside the app window.
   win.webContents.setWindowOpenHandler(({ url }) => {

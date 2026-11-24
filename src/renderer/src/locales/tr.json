@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "kobiPDF",
-    "about": "kobiPDF - Hidroteknik'in ücretsiz PDF düzenleyicisi",
+    "tagline": "kobiPDF, Hidroteknik tarafından KOBİ'lere armağan edilen ücretsiz bir PDF okuma ve düzenleme programıdır.",
     "aboutTitle": "Hakkında",
     "aboutText": "Belgelerinizi bilgisayarınızda açmak, düzenlemek ve yazdırmak için tasarlanmış çevrimdışı bir masaüstü uygulamasıdır.",
     "developer": "Geliştirici",

@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "kobiPDF",
-    "about": "kobiPDF - Free PDF Editor by Hidroteknik",
+    "tagline": "kobiPDF is a free PDF reader and editor, a gift from Hidroteknik to small businesses.",
     "aboutTitle": "About",
     "aboutText": "An offline desktop application for opening, editing, and printing documents on your computer.",
     "developer": "Developer",

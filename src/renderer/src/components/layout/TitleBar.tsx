@@ -34,7 +34,7 @@ export function TitleBar(): JSX.Element {
       <span className="mx-1 h-4 w-px bg-chrome-border" />
       <QuickAccessBar />
       <div className="min-w-0 flex-1 truncate text-center text-[12px] text-ink-muted">
-        {fileName ? `${dirty ? '* ' : ''}${fileName} - ${t('app.name')}` : t('app.about')}
+        {fileName ? `${dirty ? '* ' : ''}${fileName} - ${t('app.name')}` : t('app.name')}
       </div>
       <LanguageToggle />
       {aboutOpen && <AboutDialog onClose={() => setAboutOpen(false)} />}
