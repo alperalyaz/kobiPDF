@@ -97,6 +97,21 @@
   "android": {
     "documentsFolder": "Documents"
   },
+  "phone": {
+    "view": "View",
+    "text": "Text",
+    "sign": "Sign",
+    "menu": "Menu",
+    "done": "Done",
+    "delete": "Delete",
+    "newText": "New text",
+    "fixText": "Fix text",
+    "editHint": "Tap the text you want to fix",
+    "addHint": "Tap the page to add text",
+    "drawSignature": "Draw a signature",
+    "uploadStamp": "Upload a stamp or signature image",
+    "language": "Language"
+  },
   "defaultApp": {
     "message": "kobiPDF is not your default PDF app. Open PDFs in kobiPDF when you double-click them? In the Windows settings that open, choose kobiPDF for .pdf.",
     "makeDefault": "Make default",
@@ -108,6 +123,7 @@
     "openHint": "Open a PDF file to get started",
     "openButton": "Open PDF",
     "loading": "Loading document...",
+    "saving": "Saving...",
     "dismiss": "Dismiss",
     "cancel": "Cancel",
     "close": "Close",

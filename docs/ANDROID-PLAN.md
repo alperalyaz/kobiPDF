@@ -1,6 +1,7 @@
 # kobiPDF Android planı (Capacitor, aynı repo)
 
-Durum: Adım 0 ve Adım 1 tamamlandı (24.11.2026, `bekleyen/android-adim1` dalı). Sıradaki: Adım 2 (telefon kabuğu).
+Durum: Adım 0, 1 ve 2 tamamlandı (24.11.2026; Adım 1 `bekleyen/android-adim1`, Adım 2 `bekleyen/android-adim2` dalı,
+adım 2 adım 1'in üstüne kurulu). Sıradaki: Adım 3 (Birlikte aç / Paylaş ile gelen PDF) ve Adım 4 (yazı tipleri).
 Plan eleştirisinden geçti; bulgular aşağıya işlendi.
 
 ## Derleme (Windows, USB ile bağlı telefon)
@@ -78,6 +79,42 @@ Masaüstü derlemesi açılıyor, Yazdır yerinde, Paylaş yok.
   yakınlaştırmada geçici CSS ölçeği, bırakınca yeniden çizim; parmak boyunda tutamaçlar; telefonda daha düşük tuval sınırı.
 - Sanal klavye: yazı düzenlenirken pencere küçülünce yakınlaştırma yeniden hesaplanmaz, düzenleme kutusu klavyenin üstüne kaydırılır.
 - İmza / Kaşe penceresi dar ekrana uyar. Liste telefonun kendisinde tutulur, masaüstüyle paylaşılmaz.
+
+**Yapılan (plan eleştirisinden sonra):**
+- `components/phone/PhoneApp.tsx`: üst çubuk (dosya adı, Geri Al, Kaydet, Paylaş, ⋮ menü: Aç, Genişliğe sığdır, Kapat,
+  Hakkında, Dil), bağlamsal çubuk (yazı düzenlerken özellikler + Tamam; seçili nesnede Sil + Tamam; Metin kipinde ipucu +
+  Yeni metin), alt çubuk Görüntüle / Metin / İmza (İmza: çiz ya da kaşe resmi yükle). Klavye açıkken alt çubuk gizlenir.
+- **Tek belge:** telefonda Aç, açık belgenin kaydedilmemiş değişikliklerini sorar, sonra yerine geçer (`openReplacing`).
+  Yeni ve Farklı Kaydet telefonda yok.
+- **Dokunma (`editing/pointer.ts`):** `onTap` ile parmakla yapılan eylemler (yazıya dokunup düzeltme, yeni metin, not,
+  dışarı dokunup taslağı bitirme / seçimi kaldırma) parmak kalkınca ve kıpırdamadıysa çalışır; yazının üstünden başlayan
+  kaydırma düzenleme açmaz. `trackPointer`'a `onCancel`: tarayıcı kaydırmayı devralınca ya da ikinci parmak gelince
+  sürükleme iz bırakmadan iptal olur. Seçili olmayan nesne dokunulunca seçilir, üstünden kaydırmak onu taşımaz;
+  seçili nesne `touch-action: none` olup parmakla taşınır. Fareyle davranış değişmedi.
+- **İki parmak yakınlaştırma:** hareket boyunca yalnız CSS ölçeği, bırakınca tek `setZoom`; parmakların ortası yerinde
+  kalır. En az genişliğe sığdırmanın yarısı.
+- **Tuval belleği (masaüstünü de düzeltir):** 2 sn'den uzun görünmeyen sayfanın bitmap'i atılır. Telefonda piksel oranı
+  en fazla 2, tuval sınırı 8 M piksel.
+- **Geri tuşu yığını (`platform/back.ts`):** pencere, menü, yazı düzenleme, seçim, Metin kipi sırayla kapanır; en sonda
+  kaydedilmemiş değişiklik sorusu ya da çıkış. Kaydetme sürerken Geri bir şey yapmaz.
+- **Kaydetme göstergesi (`services/busy.ts`, `BusyOverlay`):** tam ekran "Kaydediliyor...", kayıt sürerken Kaydet /
+  Farklı Kaydet / Paylaş yok sayılır. Masaüstünde de görünür (kaydetme penceresi göstergenin arkasında kalmaz).
+- İmza görünen alanın ortasına konur ve seçili gelir (masaüstünde de görünen alanın ortası). İmza penceresi dar ekrana
+  uyar, kayıtlı imzanın silme düğmesi telefonda hep görünür. Pencere ve bildirim genişliği ekranı aşmaz.
+- Klavye: Android pencereyi küçültüyor (ölçüldü: 840 -> 510 px), düzenleme kutusu görünür alana kaydırılır.
+
+**Telefonda denenen (Redmi 12, gerçek dokunma olaylarıyla):** yazının üstünden kaydırma düzenleme açmıyor, dokunma açıyor,
+klavye geliyor; Tamam kaydedip klavyeyi kapatıyor; Geri Metin kipinden ve menüden çıkıyor; imza parmakla çiziliyor,
+görünen alana yerleşiyor, seçiliyken taşınıyor, seçili değilken üstünden kaydırma onu oynatmıyor; iki parmakla 2,5 kat
+yakınlaştırma ve alt sınır; 210 sayfanın sonuna kaydırınca bellek artmıyor (yalnız 3 sayfanın bitmap'i duruyor);
+53 MB kaydetme 41 sn, gösterge açıkken ikinci Kaydet yeni dosya üretmiyor. Masaüstü derlemesi açılıyor.
+
+**Açık kalanlar:**
+- Elle (gerçek parmakla) deneme ve ekran kaydı: otomatik testler tarayıcının kaydırma / kıstırma kararını birebir taklit etmez.
+- Masaüstünde Windows'ta elle: fareyle taşıma, boyutlandırma, Ctrl+tekerlek, El aracı, kaydetme göstergesi, imzanın yeri.
+- Yazı düzenlenince DejaVu genişliği yüzünden satır sayfadan taşabiliyor (Adım 4).
+- Kaydetme ilerleme yüzdesi yok, yalnız "Kaydediliyor...". Telefonda yazı düzenlerken küçük yazıya otomatik yakınlaşma yok.
+- İmza penceresindeki ipucu "Fare veya kalemle çizin" diyor; telefona uygun metin yok.
 
 ## Adım 3 - Android'e özgü kod
 - AndroidManifest: `application/pdf` için VIEW ve SEND. Gelen dosyayı web tarafına aktarmak için MainActivity'de küçük Kotlin kodu.

@@ -8,7 +8,8 @@ import { isDirty, markSaved } from '../editing/history'
 import { useAppStore } from '../store/useAppStore'
 import { useEditStore } from '../store/useEditStore'
 import i18n from '../locales/i18n'
-import { closeTab, openInTab } from './documentTabs'
+import { closeTab, discardParked, openInTab } from './documentTabs'
+import { isBusy, runBusy } from './busy'
 import { loadPdf, PdfLoadError } from './pdfService'
 import { mountPrintRoot, renderPrintPages } from './printService'
 
@@ -79,6 +80,19 @@ export async function openFromDialog(): Promise<void> {
   await loadOpenedFile(await window.api.openFile())
 }
 
+/**
+ * Phone: one document at a time (memory, and no tab strip). Settles the open document's unsaved
+ * changes first, then replaces it with the picked file. Cancelling the picker keeps the old one.
+ */
+export async function openReplacing(): Promise<void> {
+  if (isBusy()) return
+  const previous = store().activeDocumentId
+  if (previous && !(await confirmUnsaved())) return
+  await openFromDialog()
+  const current = store().activeDocumentId
+  if (previous && current !== previous) await discardParked(previous)
+}
+
 let untitledCount = 0
 
 /** Asks for a page size and opens a new document with one blank page in its own tab. */
@@ -111,12 +125,16 @@ async function exportOrReport(): Promise<Uint8Array | null> {
   }
 }
 
-export async function saveAs(): Promise<boolean> {
-  const doc = store().document
-  if (!doc) return false
+const SAVING = 'common.saving'
+
+/** The bytes to write: all edits applied and kobiPDF in the document info. Slow for large files. */
+async function prepareBytes(): Promise<Uint8Array | null> {
   const bytes = await exportOrReport()
-  if (!bytes) return false
-  const result = await window.api.saveFileAs(await withKobiMetadata(bytes), doc.name)
+  return bytes ? withKobiMetadata(bytes) : null
+}
+
+async function writeAs(name: string, bytes: Uint8Array): Promise<boolean> {
+  const result = await window.api.saveFileAs(bytes, name)
   if (!result.ok) {
     reportFailure(result)
     return false
@@ -127,25 +145,46 @@ export async function saveAs(): Promise<boolean> {
   return true
 }
 
+export async function saveAs(): Promise<boolean> {
+  if (isBusy()) return false
+  const doc = store().document
+  if (!doc) return false
+  // Android has no save dialog, so writing belongs to the long work. On the desktop the dialog
+  // must not sit behind the busy overlay.
+  if (__ANDROID__) {
+    return runBusy(SAVING, async () => {
+      const bytes = await prepareBytes()
+      return bytes ? writeAs(doc.name, bytes) : false
+    })
+  }
+  const bytes = await runBusy(SAVING, prepareBytes)
+  return bytes ? writeAs(doc.name, bytes) : false
+}
+
 export async function save(): Promise<boolean> {
+  if (isBusy()) return false
   const doc = store().document
   if (!doc) return false
   if (!doc.path) return saveAs()
-  const bytes = await exportOrReport()
-  if (!bytes) return false
-  const result = await window.api.saveFile(doc.path, await withKobiMetadata(bytes))
-  if (!result.ok) {
-    reportFailure(result)
-    return false
-  }
-  markSaved()
-  store().showNotice({ kind: 'info', key: 'messages.saved', params: { name: result.value.location ?? result.value.name } })
-  return true
+  const path = doc.path
+  return runBusy(SAVING, async () => {
+    const bytes = await prepareBytes()
+    if (!bytes) return false
+    const result = await window.api.saveFile(path, bytes)
+    if (!result.ok) {
+      reportFailure(result)
+      return false
+    }
+    markSaved()
+    store().showNotice({ kind: 'info', key: 'messages.saved', params: { name: result.value.location ?? result.value.name } })
+    return true
+  })
 }
 
 /** Android: saves (a copy, the first time) and opens the share sheet for that file. */
 export async function share(): Promise<void> {
-  if (!window.api.shareFile || !(await save())) return
+  if (isBusy() || !window.api.shareFile || !(await save())) return
+  // The busy overlay is gone by now, so it does not sit over the share sheet.
   const path = store().document?.path
   if (path) await window.api.shareFile(path)
 }

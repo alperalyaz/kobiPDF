@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
-import { LoaderCircle } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 import { DialogHost } from './components/dialogs/DialogHost'
+import { BusyOverlay } from './components/layout/BusyOverlay'
+import { PhoneApp } from './components/phone/PhoneApp'
 import { DefaultAppBanner } from './components/layout/DefaultAppBanner'
 import { DocumentTabs } from './components/layout/DocumentTabs'
 import { NoticeBar } from './components/layout/NoticeBar'
@@ -52,10 +52,8 @@ function useUnsavedCloseGuard(): void {
 }
 
 export default function App(): JSX.Element {
-  const { t } = useTranslation()
   const doc = useAppStore((s) => s.document)
   const activeDocumentId = useAppStore((s) => s.activeDocumentId)
-  const loading = useAppStore((s) => s.loading)
 
   useShortcuts()
   useExternalFileOpening()
@@ -64,6 +62,9 @@ export default function App(): JSX.Element {
   useEffect(() => {
     registerFonts()
   }, [])
+
+  // The phone has its own layout; the desktop ribbon, tabs and sidebar never show there.
+  if (__ANDROID__) return <PhoneApp />
 
   return (
     <div className="flex h-full flex-col">
@@ -76,19 +77,12 @@ export default function App(): JSX.Element {
         <Sidebar />
         <main className="relative min-w-0 flex-1">
           {doc ? <PdfViewer key={activeDocumentId ?? doc.name} doc={doc} /> : <EmptyState />}
-          {loading && (
-            <div className="absolute inset-0 z-40 flex items-center justify-center bg-workspace/70">
-              <div className="flex items-center gap-2 rounded-md bg-white px-4 py-3 shadow">
-                <LoaderCircle size={18} className="animate-spin text-brand" />
-                <span>{t('common.loading')}</span>
-              </div>
-            </div>
-          )}
           <NoticeBar />
         </main>
       </div>
       <StatusBar />
       <DialogHost />
+      <BusyOverlay />
     </div>
   )
 }

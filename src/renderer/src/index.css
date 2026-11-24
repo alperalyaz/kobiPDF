@@ -127,6 +127,29 @@
   cursor: pointer;
 }
 
+/* Phone (PhoneApp adds the class). */
+.android,
+.android * {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.android body {
+  overscroll-behavior: none;
+}
+
+/* Long press must not pop the system callout over text or images. */
+.android .textLayer,
+.android img {
+  -webkit-touch-callout: none;
+}
+
+/* No hover on a finger: show every fixable text faintly instead, and never leave a "stuck" hover. */
+.android .textLayer.edit-text span,
+.android .textLayer.edit-text span:hover {
+  outline: 1px dashed rgb(31 43 69 / 0.28);
+  background: transparent;
+}
+
 #print-root {
   display: none;
 }

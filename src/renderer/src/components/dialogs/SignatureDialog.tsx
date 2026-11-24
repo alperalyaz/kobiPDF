@@ -270,7 +270,8 @@ export function SignatureDialog(): JSX.Element {
                     aria-label={t('dialogs.signature.remove')}
                     title={t('dialogs.signature.remove')}
                     onClick={() => removeSaved(entry)}
-                    className="absolute -right-1.5 -top-1.5 hidden size-5 items-center justify-center rounded-full bg-ink text-[11px] leading-none text-white group-hover:flex"
+                    // No hover on a phone: the remove button is always shown there, and bigger.
+                    className={`absolute items-center justify-center rounded-full bg-ink leading-none text-white ${__ANDROID__ ? '-right-2.5 -top-2.5 flex size-7 text-[15px]' : '-right-1.5 -top-1.5 hidden size-5 text-[11px] group-hover:flex'}`}
                   >
                     ×
                   </button>
@@ -279,7 +280,7 @@ export function SignatureDialog(): JSX.Element {
             </div>
           </div>
         )}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1.5">
             {COLORS.map((c) => (
               <button
@@ -318,8 +319,9 @@ export function SignatureDialog(): JSX.Element {
           ref={canvasRef}
           width={CANVAS_WIDTH * PIXEL_RATIO}
           height={CANVAS_HEIGHT * PIXEL_RATIO}
-          style={{ width: CANVAS_WIDTH, height: CANVAS_HEIGHT, touchAction: 'none' }}
-          className="relative cursor-crosshair bg-transparent"
+          // Fills the dialog on a narrow screen; pointFor() maps by proportion, so drawing stays exact.
+          style={{ width: '100%', maxWidth: CANVAS_WIDTH, aspectRatio: `${CANVAS_WIDTH} / ${CANVAS_HEIGHT}`, touchAction: 'none' }}
+          className="relative block cursor-crosshair bg-transparent"
           onPointerDown={(e) => {
             e.currentTarget.setPointerCapture(e.pointerId)
             const p = pointFor(e)
@@ -330,6 +332,9 @@ export function SignatureDialog(): JSX.Element {
             if (lastPoint.current) drawTo(pointFor(e))
           }}
           onPointerUp={() => {
+            lastPoint.current = null
+          }}
+          onPointerCancel={() => {
             lastPoint.current = null
           }}
         />

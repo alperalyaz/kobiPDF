@@ -175,6 +175,11 @@ function closeActive(): void {
   void closing.pdf.loadingTask.destroy()
 }
 
+/** Drops a background tab without asking (the caller already settled its unsaved changes). */
+export function discardParked(id: string): Promise<void> {
+  return enqueue(async () => dropParked(id))
+}
+
 /** Closes one tab. A dirty parked tab is brought forward so save still works. */
 export function closeTab(id?: string): Promise<void> {
   return enqueue(() => closeNow(id))

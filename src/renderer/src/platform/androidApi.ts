@@ -9,6 +9,7 @@ import { Directory, Filesystem } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
 import type { FileErrorCode, KobiPdfApi, OpenedFile, OpenedImage, Result, SavedFile } from '../../../shared/ipc'
 import i18n from '../locales/i18n'
+import { runBack } from './back'
 
 const FOLDER = 'kobiPDF'
 const DIR = Directory.Documents
@@ -170,6 +171,8 @@ let dirty = false
 const closeListeners = new Set<() => void>()
 
 void App.addListener('backButton', () => {
+  // Dialogs, menus, the open text box and the selection close first (platform/back.ts).
+  if (runBack()) return
   if (dirty && closeListeners.size > 0) closeListeners.forEach((cb) => cb())
   else void App.exitApp()
 })

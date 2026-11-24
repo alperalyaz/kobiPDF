@@ -8,7 +8,8 @@ import { COMMENT_PADDING } from '../../editing/types'
 import { useEditStore, type TextDraft } from '../../store/useEditStore'
 import { boxStyle, textCss } from './ObjectViews'
 
-const GRIP = 8
+/** Width of the move border around the text box; finger-sized on the phone. */
+const GRIP = __ANDROID__ ? 18 : 8
 
 export function DraftEditor({
   draft,
@@ -48,12 +49,19 @@ export function DraftEditor({
         if (!node) return
         node.focus({ preventScroll: true })
         if (caret) node.setSelectionRange(caret.start, caret.end)
-      }
+      },
+      // A second finger (pinch) cancels the move: put the box back.
+      onCancel: () => useEditStore.getState().updateDraft(origin)
     })
   }
 
   const grip = (style: CSSProperties): JSX.Element => (
-    <div data-draft title={t('properties.move')} onPointerDown={onGripPointerDown} style={{ position: 'absolute', cursor: 'move', ...style }} />
+    <div
+      data-draft
+      title={t('properties.move')}
+      onPointerDown={onGripPointerDown}
+      style={{ position: 'absolute', cursor: 'move', touchAction: 'none', ...style }}
+    />
   )
 
   return (

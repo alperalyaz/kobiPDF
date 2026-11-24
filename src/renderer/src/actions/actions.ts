@@ -56,7 +56,16 @@ import {
   rotatePages,
   splitPdf
 } from '../editing/pageOps'
-import { closeDocument, newDocument, openFromDialog, print, save, saveAs, share } from '../services/fileService'
+import {
+  closeDocument,
+  newDocument,
+  openFromDialog,
+  openReplacing,
+  print,
+  save,
+  saveAs,
+  share
+} from '../services/fileService'
 import { useAppStore, type AppState, type ToolId } from '../store/useAppStore'
 import { useEditStore, type EditState } from '../store/useEditStore'
 
@@ -92,7 +101,12 @@ function tool(id: ToolId, icon: LucideIcon, labelKey: string, shortcut?: string)
 
 export const actions = {
   newDocument: { icon: FilePlus, labelKey: 'tools.newDocument', shortcut: 'Ctrl+N', run: () => void newDocument() },
-  open: { icon: FolderOpen, labelKey: 'tools.open', shortcut: 'Ctrl+O', run: () => void openFromDialog() },
+  open: {
+    icon: FolderOpen,
+    labelKey: 'tools.open',
+    shortcut: 'Ctrl+O',
+    run: () => void (__ANDROID__ ? openReplacing() : openFromDialog())
+  },
   save: { icon: Save, labelKey: 'tools.save', shortcut: 'Ctrl+S', enabled: hasDoc, run: () => void save() },
   saveAs: { icon: SaveAll, labelKey: 'tools.saveAs', shortcut: 'Ctrl+Shift+S', enabled: hasDoc, run: () => void saveAs() },
   print: {

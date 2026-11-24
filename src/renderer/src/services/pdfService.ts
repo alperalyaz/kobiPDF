@@ -6,7 +6,9 @@ import type { PageSize } from '../store/useAppStore'
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl
 
 const assetBase = new URL('./pdfjs/', document.baseURI).href
-const MAX_CANVAS_PIXELS = 16_777_216
+// Phones have high pixel ratios (about 2.75) but far less memory: cap both there.
+const MAX_CANVAS_PIXELS = __ANDROID__ ? 8_388_608 : 16_777_216
+const MAX_PIXEL_RATIO = __ANDROID__ ? 2 : Infinity
 
 export type PdfLoadErrorCode = 'CORRUPT' | 'PASSWORD' | 'UNKNOWN'
 
@@ -101,7 +103,7 @@ export function renderPageToCanvas(
     const base = page.getViewport({ scale })
     // Cap the backing store so very high zoom levels don't exhaust GPU memory.
     const maxPixelRatio = Math.sqrt(MAX_CANVAS_PIXELS / (base.width * base.height))
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, maxPixelRatio)
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, maxPixelRatio, MAX_PIXEL_RATIO)
     const viewport = page.getViewport({ scale: scale * pixelRatio })
     // Render offscreen: resizing the visible canvas would blank it until the render finishes.
     const offscreen = document.createElement('canvas')

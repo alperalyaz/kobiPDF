@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useBackHandler } from '../../platform/back'
 
 interface ModalProps {
   title: string
@@ -13,6 +14,7 @@ interface ModalProps {
 
 export function Modal({ title, onCancel, children, footer, width = 420 }: ModalProps): JSX.Element {
   const { t } = useTranslation()
+  useBackHandler(true, onCancel)
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
@@ -32,7 +34,8 @@ export function Modal({ title, onCancel, children, footer, width = 420 }: ModalP
         aria-modal="true"
         aria-label={title}
         className="flex max-h-[90vh] flex-col rounded-lg border border-chrome-border bg-white shadow-2xl"
-        style={{ width }}
+        // On a phone the dialog never gets wider than the screen.
+        style={{ width: `min(${width}px, calc(100vw - 24px))` }}
       >
         <div className="flex items-center justify-between border-b border-chrome-border px-4 py-2.5">
           <h2 className="text-[13px] font-semibold text-ink">{title}</h2>
@@ -40,9 +43,9 @@ export function Modal({ title, onCancel, children, footer, width = 420 }: ModalP
             type="button"
             aria-label={t('common.cancel')}
             onClick={onCancel}
-            className="rounded p-1 text-ink-muted hover:bg-chrome"
+            className={`rounded text-ink-muted hover:bg-chrome ${__ANDROID__ ? 'p-2.5' : 'p-1'}`}
           >
-            <X size={15} />
+            <X size={__ANDROID__ ? 20 : 15} />
           </button>
         </div>
         <div className="overflow-y-auto px-4 py-3 text-[12px] text-ink">{children}</div>
@@ -78,7 +81,7 @@ export function DialogButton({
       onClick={onClick}
       disabled={disabled}
       autoFocus={autoFocus}
-      className={`min-w-20 rounded border px-3 py-1.5 text-[12px] font-medium disabled:opacity-40 ${tone}`}
+      className={`min-w-20 rounded border px-3 font-medium disabled:opacity-40 ${__ANDROID__ ? 'min-h-10 py-2 text-[14px]' : 'py-1.5 text-[12px]'} ${tone}`}
     >
       {children}
     </button>

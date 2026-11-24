@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { commitDraft } from '../../editing/draft'
+import { onTap } from '../../editing/pointer'
 import { MARKUP_TOOLS, markupFromSelection } from '../../editing/pageTools'
 import { useAppStore, type OpenDocument } from '../../store/useAppStore'
 import { useEditStore } from '../../store/useEditStore'
@@ -8,8 +9,23 @@ import { closeNote } from '../../editing/notes'
 import { PageLayers } from './PageLayers'
 import { usePanning } from './usePanning'
 
-const PAGE_GAP = 12
-const VIEW_PADDING = 24
+const PAGE_GAP = __ANDROID__ ? 8 : 12
+const VIEW_PADDING = __ANDROID__ ? 8 : 24
+/** Phone pinch can zoom out to this fraction of the fit-width zoom, no further (too many pages would render). */
+const MIN_PINCH_OF_FIT = 0.5
+
+interface Pinch {
+  startDistance: number
+  startZoom: number
+  /** Content point (scroll-content coordinates) under the fingers' midpoint at the start. */
+  originX: number
+  originY: number
+  scale: number
+}
+
+function distance(a: Touch, b: Touch): number {
+  return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)
+}
 
 interface ZoomAnchor {
   /** Anchor point relative to the scroll container's visible area. */
@@ -19,6 +35,8 @@ interface ZoomAnchor {
 
 export function PdfViewer({ doc }: { doc: OpenDocument }): JSX.Element {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const pinchRef = useRef<Pinch | null>(null)
   const zoom = useAppStore((s) => s.zoom)
   const zoomMode = useAppStore((s) => s.zoomMode)
   const scrollMode = useAppStore((s) => s.scrollMode)
@@ -38,9 +56,16 @@ export function PdfViewer({ doc }: { doc: OpenDocument }): JSX.Element {
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
-    const observer = new ResizeObserver(() =>
+    const observer = new ResizeObserver(() => {
       setViewportSize({ width: el.clientWidth, height: el.clientHeight })
-    )
+      // The on-screen keyboard shrinks the viewer; keep the text being edited in sight.
+      if (__ANDROID__) {
+        const active = document.activeElement
+        if (active instanceof HTMLElement && active.closest('[data-draft]')) {
+          window.setTimeout(() => active.scrollIntoView({ block: 'nearest', inline: 'nearest' }), 50)
+        }
+      }
+    })
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
@@ -74,7 +99,69 @@ export function PdfViewer({ doc }: { doc: OpenDocument }): JSX.Element {
     const ratio = zoom / previous
     el.scrollLeft = (el.scrollLeft + anchor.x) * ratio - anchor.x
     el.scrollTop = (el.scrollTop + anchor.y) * ratio - anchor.y
+    // A finished pinch: the real zoom now matches the temporary CSS scale, drop it in the same frame.
+    if (contentRef.current) contentRef.current.style.transform = ''
   }, [zoom])
+
+  // Phone: two-finger pinch. While the fingers move only a CSS scale is applied (cheap); on release the
+  // zoom is set once and the scroll position keeps the pinched point in place. Listeners are passive:
+  // `touch-action: pan-x pan-y` on the container already stops the WebView's own page zoom.
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!__ANDROID__ || !el) return
+    const onTouchStart = (e: TouchEvent): void => {
+      if (e.touches.length !== 2) return
+      const [a, b] = [e.touches[0], e.touches[1]]
+      const rect = el.getBoundingClientRect()
+      const originX = el.scrollLeft + (a.clientX + b.clientX) / 2 - rect.left
+      const originY = el.scrollTop + (a.clientY + b.clientY) / 2 - rect.top
+      pinchRef.current = {
+        startDistance: Math.max(1, distance(a, b)),
+        startZoom: useAppStore.getState().zoom,
+        originX,
+        originY,
+        scale: 1
+      }
+      if (contentRef.current) {
+        contentRef.current.style.transformOrigin = `${originX}px ${originY}px`
+        contentRef.current.style.willChange = 'transform'
+      }
+    }
+    const onTouchMove = (e: TouchEvent): void => {
+      const pinch = pinchRef.current
+      if (!pinch || e.touches.length < 2) return
+      const { width } = el.getBoundingClientRect()
+      const widest = Math.max(...doc.pageSizes.map((p) => p.width))
+      const minZoom = ((width - VIEW_PADDING * 2) / widest) * MIN_PINCH_OF_FIT
+      const target = Math.min(Math.max(pinch.startZoom * (distance(e.touches[0], e.touches[1]) / pinch.startDistance), minZoom), 6)
+      pinch.scale = target / pinch.startZoom
+      if (contentRef.current) contentRef.current.style.transform = `scale(${pinch.scale})`
+    }
+    const onTouchEnd = (e: TouchEvent): void => {
+      const pinch = pinchRef.current
+      if (!pinch || e.touches.length >= 2) return
+      pinchRef.current = null
+      if (contentRef.current) contentRef.current.style.willChange = ''
+      const next = pinch.startZoom * pinch.scale
+      if (Math.abs(next - useAppStore.getState().zoom) < 0.001) {
+        if (contentRef.current) contentRef.current.style.transform = ''
+        return
+      }
+      // The pinched content point sits at (origin - current scroll) on screen; keep it there.
+      zoomAnchorRef.current = { x: pinch.originX - el.scrollLeft, y: pinch.originY - el.scrollTop }
+      useAppStore.getState().setZoom(next)
+    }
+    el.addEventListener('touchstart', onTouchStart, { passive: true })
+    el.addEventListener('touchmove', onTouchMove, { passive: true })
+    el.addEventListener('touchend', onTouchEnd, { passive: true })
+    el.addEventListener('touchcancel', onTouchEnd, { passive: true })
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart)
+      el.removeEventListener('touchmove', onTouchMove)
+      el.removeEventListener('touchend', onTouchEnd)
+      el.removeEventListener('touchcancel', onTouchEnd)
+    }
+  }, [doc])
 
   // Ctrl + wheel zoom; registered natively because React wheel listeners are passive.
   useEffect(() => {
@@ -129,11 +216,14 @@ export function PdfViewer({ doc }: { doc: OpenDocument }): JSX.Element {
   }
 
   // Clicking anywhere outside the open text box, selection or note commits / clears them.
+  // With a finger this waits for a tap, so a finger placed to scroll keeps the text box and selection.
   const onPointerDownCapture = (event: React.PointerEvent<HTMLDivElement>): void => {
     const target = event.target as HTMLElement
-    if (!target.closest('[data-draft]')) commitDraft()
-    if (!target.closest('[data-object]')) useEditStore.getState().select(null)
-    if (!target.closest('[data-note-popup]') && !target.closest('[data-object]')) closeNote()
+    onTap(event, () => {
+      if (!target.closest('[data-draft]')) commitDraft()
+      if (!target.closest('[data-object]')) useEditStore.getState().select(null)
+      if (!target.closest('[data-note-popup]') && !target.closest('[data-object]')) closeNote()
+    })
   }
 
   // Markup tools turn a finished text selection into highlight / underline / strikeout.
@@ -153,13 +243,14 @@ export function PdfViewer({ doc }: { doc: OpenDocument }): JSX.Element {
     <div
       ref={scrollRef}
       data-viewer
-      className={`relative h-full w-full overflow-auto bg-workspace ${cursor}`}
+      className={`relative h-full w-full overflow-auto bg-workspace ${cursor} ${__ANDROID__ ? 'touch-pan-x touch-pan-y' : ''}`}
       onScroll={onScroll}
       onWheel={onWheelSingle}
       onPointerDownCapture={onPointerDownCapture}
       {...panHandlers}
     >
       <div
+        ref={contentRef}
         className="flex min-h-full min-w-fit flex-col items-center"
         style={{ padding: VIEW_PADDING, gap: PAGE_GAP }}
       >

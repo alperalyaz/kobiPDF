@@ -9,7 +9,7 @@ export function EmptyState(): JSX.Element {
 
   return (
     <div className="flex h-full items-center justify-center">
-      <div className="flex w-[340px] flex-col items-center rounded-lg border border-chrome-border bg-white px-8 py-10 text-center shadow-sm">
+      <div className="flex w-[min(340px,calc(100vw-32px))] flex-col items-center rounded-lg border border-chrome-border bg-white px-8 py-10 text-center shadow-sm">
         <h1>
           <img src={logoFull} alt={t('app.name')} className="h-40 w-auto" draggable={false} />
         </h1>
@@ -22,7 +22,7 @@ export function EmptyState(): JSX.Element {
         >
           <FolderOpen size={16} />
           {t('common.openButton')}
-          <span className="text-[11px] font-normal opacity-80">{formatShortcut('Ctrl+O')}</span>
+          {!__ANDROID__ && <span className="text-[11px] font-normal opacity-80">{formatShortcut('Ctrl+O')}</span>}
         </button>
       </div>
     </div>

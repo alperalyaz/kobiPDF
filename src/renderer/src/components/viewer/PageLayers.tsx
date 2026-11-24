@@ -18,7 +18,7 @@ import { addObject, removeObjects, replaceObject, updateObject } from '../../edi
 import { objectBox } from '../../editing/layout'
 import { closeNote } from '../../editing/notes'
 import { editPageText, MARKUP_TOOLS } from '../../editing/pageTools'
-import { trackPointer } from '../../editing/pointer'
+import { isTouchLike, onTap, trackPointer } from '../../editing/pointer'
 import {
   newId,
   NOTE_SIZE,
@@ -236,7 +236,8 @@ export function PageLayers({ pdf, pageIndex, size, zoom, visible }: PageLayersPr
       onUp: () => {
         setLiveStroke(null)
         addObject({ id: newId(), kind: 'ink', pageIndex, points, ...style }, false)
-      }
+      },
+      onCancel: () => setLiveStroke(null)
     })
   }
 
@@ -248,7 +249,8 @@ export function PageLayers({ pdf, pageIndex, size, zoom, visible }: PageLayersPr
       onUp: (_dx, _dy, moved, ev) => {
         setLiveRect(null)
         onDone(rectFromPoints(start, toPage(ev.clientX, ev.clientY)), moved)
-      }
+      },
+      onCancel: () => setLiveRect(null)
     })
   }
 
@@ -269,10 +271,35 @@ export function PageLayers({ pdf, pageIndex, size, zoom, visible }: PageLayersPr
     if (hits.length > 0) removeObjects(hits, key)
   }
 
+  const addNoteAt = (p: Point): void => {
+    commitDraft()
+    const note: NoteObject = {
+      id: newId(),
+      kind: 'note',
+      pageIndex,
+      x: p.x - NOTE_SIZE / 2,
+      y: p.y - NOTE_SIZE / 2,
+      text: '',
+      color: useEditStore.getState().settings.note.color
+    }
+    addObject(note)
+    useEditStore.getState().setOpenNote(note.id)
+  }
+
   const onFramePointerDown = (e: ReactPointerEvent<HTMLDivElement>): void => {
     if (e.button !== 0) return
     const p = toPage(e.clientX, e.clientY)
     const { settings } = useEditStore.getState()
+
+    // Tap tools: with a finger they act on release, so the same finger can still scroll the page.
+    if (isTouchLike(e) && (tool === 'addText' || tool === 'stickyNote' || tool === 'editText')) {
+      onTap(e, () => {
+        if (tool === 'addText') startNewDraft('text', pageIndex, p)
+        else if (tool === 'editText') useAppStore.getState().showNotice({ kind: 'info', key: 'errors.noText' })
+        else addNoteAt(p)
+      })
+      return
+    }
 
     switch (tool) {
       case 'addText':
@@ -293,24 +320,14 @@ export function PageLayers({ pdf, pageIndex, size, zoom, visible }: PageLayersPr
             // The box's on-screen top-left is the drag's top-left; its width the drag width.
             const anchor = toPage(clientX + Math.min(0, dx), clientY + Math.min(0, dy))
             startNewDraft('comment', pageIndex, anchor, Math.max(60, Math.abs(dx) / zoom))
-          }
+          },
+          onCancel: () => setLiveRect(null)
         })
         return
       }
       case 'stickyNote': {
         e.preventDefault()
-        commitDraft()
-        const note: NoteObject = {
-          id: newId(),
-          kind: 'note',
-          pageIndex,
-          x: p.x - NOTE_SIZE / 2,
-          y: p.y - NOTE_SIZE / 2,
-          text: '',
-          color: settings.note.color
-        }
-        addObject(note)
-        useEditStore.getState().setOpenNote(note.id)
+        addNoteAt(p)
         return
       }
       case 'pen':
@@ -361,11 +378,33 @@ export function PageLayers({ pdf, pageIndex, size, zoom, visible }: PageLayersPr
     }
   }
 
+  const toggleNote = (obj: EditObject): void => {
+    if (obj.kind !== 'note') return
+    const { openNoteId: open, setOpenNote } = useEditStore.getState()
+    if (open === obj.id) closeNote(obj.id)
+    else setOpenNote(obj.id)
+  }
+
   const onObjectPointerDown = (obj: EditObject, e: ReactPointerEvent): void => {
     if (e.button !== 0) return
     e.stopPropagation()
+    const editsText = tool === 'editText' && (obj.kind === 'text' || obj.kind === 'comment')
+    // With a finger, an object that is not selected yet is only tapped: selected (or opened for
+    // editing). Dragging across it scrolls the page and must not move it. Once selected, it is
+    // `touch-action: none` and the drag below moves it.
+    if (isTouchLike(e) && (editsText || useEditStore.getState().selectedId !== obj.id)) {
+      onTap(e, () => {
+        if (editsText) {
+          startObjectDraft(obj)
+          return
+        }
+        useEditStore.getState().select(obj.id)
+        toggleNote(obj)
+      })
+      return
+    }
     e.preventDefault()
-    if (tool === 'editText' && (obj.kind === 'text' || obj.kind === 'comment')) {
+    if (editsText) {
       startObjectDraft(obj)
       return
     }
@@ -378,14 +417,10 @@ export function PageLayers({ pdf, pageIndex, size, zoom, visible }: PageLayersPr
       },
       onUp: (_dx, _dy, moved) => {
         setPreview(null)
-        if (moved && latest) {
-          replaceObject(latest)
-        } else if (obj.kind === 'note') {
-          const { openNoteId: open, setOpenNote } = useEditStore.getState()
-          if (open === obj.id) closeNote(obj.id)
-          else setOpenNote(obj.id)
-        }
-      }
+        if (moved && latest) replaceObject(latest)
+        else toggleNote(obj)
+      },
+      onCancel: () => setPreview(null)
     })
   }
 
@@ -411,7 +446,8 @@ export function PageLayers({ pdf, pageIndex, size, zoom, visible }: PageLayersPr
       onUp: (_dx, _dy, moved) => {
         setPreview(null)
         if (moved && latest) replaceObject(latest)
-      }
+      },
+      onCancel: () => setPreview(null)
     })
   }
 
@@ -449,8 +485,13 @@ export function PageLayers({ pdf, pageIndex, size, zoom, visible }: PageLayersPr
           onSpanPointerDown={
             tool === 'editText'
               ? (span, event) => {
-                  event.preventDefault()
                   event.stopPropagation()
+                  if (isTouchLike(event)) {
+                    // A finger on text may be the start of a scroll: edit only on a tap.
+                    onTap(event, () => editPageText(span, pageIndex))
+                    return
+                  }
+                  event.preventDefault()
                   editPageText(span, pageIndex)
                 }
               : undefined
@@ -545,13 +586,17 @@ export function PageLayers({ pdf, pageIndex, size, zoom, visible }: PageLayersPr
             ...boxStyle(objectBox(o), zoom),
             zIndex: 10,
             pointerEvents: objectsInteractive ? 'auto' : 'none',
-            cursor: tool === 'editText' && o.kind !== 'image' ? 'text' : 'move'
+            cursor: tool === 'editText' && o.kind !== 'image' ? 'text' : 'move',
+            // A selected object follows the finger; others let the finger scroll the page.
+            touchAction: o.id === selectedId ? 'none' : undefined
           }}
           onPointerDown={(e) => onObjectPointerDown(o, e)}
           onDoubleClick={() => {
             if (o.kind !== 'image' && tool !== 'editText') startObjectDraft(o)
           }}
         >
+          {/* Phone: small objects (a line of text is a few pixels tall) get a finger-sized hit area. */}
+          {__ANDROID__ && <div className="absolute" style={{ inset: '-14px -8px' }} />}
           <BoxObjectContent obj={o} zoom={zoom} pageRotation={size.rotation} />
         </div>
       ))}
@@ -620,6 +665,9 @@ export function PageLayers({ pdf, pageIndex, size, zoom, visible }: PageLayersPr
   )
 }
 
+const TOUCH_HANDLE = 40
+const TOUCH_OUTSET = 12
+
 const CORNERS: Point[] = [
   { x: -1, y: -1 },
   { x: 1, y: -1 },
@@ -652,19 +700,45 @@ function SelectionFrame({
         outlineOffset: 2
       }}
     >
-      {handles.map((c) => (
-        <div
-          key={`${c.x},${c.y}`}
-          data-object
-          className="pointer-events-auto absolute size-2.5 rounded-[2px] border border-brand bg-white"
-          style={{
-            left: `calc(${((c.x + 1) / 2) * 100}% - 5px)`,
-            top: `calc(${((c.y + 1) / 2) * 100}% - 5px)`,
-            cursor: c.y === 0 ? 'ew-resize' : c.x === c.y ? 'nwse-resize' : 'nesw-resize'
-          }}
-          onPointerDown={(e) => onHandlePointerDown(c, e)}
-        />
-      ))}
+      {handles.map((c) =>
+        __ANDROID__ ? (
+          // Phone: a 40 px touch area pushed mostly outside the object, so small objects stay movable
+          // from their middle; the visible square still sits on the corner.
+          <div
+            key={`${c.x},${c.y}`}
+            data-object
+            className="pointer-events-auto absolute"
+            style={{
+              width: TOUCH_HANDLE,
+              height: TOUCH_HANDLE,
+              left: `calc(${((c.x + 1) / 2) * 100}% - ${TOUCH_HANDLE / 2}px + ${c.x * TOUCH_OUTSET}px)`,
+              top: `calc(${((c.y + 1) / 2) * 100}% - ${TOUCH_HANDLE / 2}px + ${c.y * TOUCH_OUTSET}px)`,
+              touchAction: 'none'
+            }}
+            onPointerDown={(e) => onHandlePointerDown(c, e)}
+          >
+            <div
+              className="absolute size-3.5 rounded-[3px] border-2 border-brand bg-white"
+              style={{
+                left: TOUCH_HANDLE / 2 - c.x * TOUCH_OUTSET - 7,
+                top: TOUCH_HANDLE / 2 - c.y * TOUCH_OUTSET - 7
+              }}
+            />
+          </div>
+        ) : (
+          <div
+            key={`${c.x},${c.y}`}
+            data-object
+            className="pointer-events-auto absolute size-2.5 rounded-[2px] border border-brand bg-white"
+            style={{
+              left: `calc(${((c.x + 1) / 2) * 100}% - 5px)`,
+              top: `calc(${((c.y + 1) / 2) * 100}% - 5px)`,
+              cursor: c.y === 0 ? 'ew-resize' : c.x === c.y ? 'nwse-resize' : 'nesw-resize'
+            }}
+            onPointerDown={(e) => onHandlePointerDown(c, e)}
+          />
+        )
+      )}
     </div>
   )
 }

@@ -23,7 +23,7 @@ export function NoticeBar(): JSX.Element | null {
   return (
     <div
       role={isError ? 'alert' : 'status'}
-      className={`absolute bottom-4 left-1/2 z-50 flex max-w-[560px] -translate-x-1/2 items-start gap-2 rounded-md border px-3 py-2 text-[12px] shadow-lg ${isError ? 'border-brand/30 bg-brand-soft text-brand-dark' : 'border-chrome-border bg-white text-ink'}`}
+      className={`absolute bottom-4 left-1/2 z-50 flex w-max max-w-[min(560px,calc(100vw-24px))] -translate-x-1/2 items-start gap-2 rounded-md border px-3 py-2 shadow-lg ${__ANDROID__ ? 'text-[14px]' : 'text-[12px]'} ${isError ? 'border-brand/30 bg-brand-soft text-brand-dark' : 'border-chrome-border bg-white text-ink'}`}
     >
       <Icon size={16} className="mt-px shrink-0" />
       <span className="flex-1">{t(notice.key, notice.params)}</span>

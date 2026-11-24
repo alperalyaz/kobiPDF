@@ -97,6 +97,21 @@
   "android": {
     "documentsFolder": "Belgeler"
   },
+  "phone": {
+    "view": "Görüntüle",
+    "text": "Metin",
+    "sign": "İmza",
+    "menu": "Menü",
+    "done": "Tamam",
+    "delete": "Sil",
+    "newText": "Yeni metin",
+    "fixText": "Yazı düzelt",
+    "editHint": "Düzeltmek istediğiniz yazıya dokunun",
+    "addHint": "Yazı eklemek için sayfaya dokunun",
+    "drawSignature": "İmza çiz",
+    "uploadStamp": "Kaşe veya imza resmi yükle",
+    "language": "Dil"
+  },
   "defaultApp": {
     "message": "kobiPDF şu an varsayılan PDF programınız değil. PDF dosyaları çift tıklanınca kobiPDF'te açılsın mı? Açılan Windows ayarlarında .pdf için kobiPDF'i seçin.",
     "makeDefault": "Varsayılan yap",
@@ -108,6 +123,7 @@
     "openHint": "Başlamak için bir PDF dosyası açın",
     "openButton": "PDF Aç",
     "loading": "Belge yükleniyor...",
+    "saving": "Kaydediliyor...",
     "dismiss": "Kapat",
     "cancel": "İptal",
     "close": "Kapat",

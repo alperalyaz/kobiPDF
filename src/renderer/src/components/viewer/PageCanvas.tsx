@@ -3,6 +3,8 @@ import type { PDFDocumentProxy } from 'pdfjs-dist'
 import { renderPageToCanvas } from '../../services/pdfService'
 import type { PageSize } from '../../store/useAppStore'
 
+const RELEASE_DELAY_MS = 2000
+
 interface PageCanvasProps {
   pdf: PDFDocumentProxy
   pageNumber: number
@@ -44,6 +46,20 @@ export function PageCanvas({
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
+
+  // Free the bitmap of a page that stayed out of view for a while; a long document would otherwise keep
+  // every page it ever showed in memory (hundreds of MB on a phone). The delay avoids a blank flash when
+  // scrolling back and forth.
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (visible || !canvas) return
+    const timer = window.setTimeout(() => {
+      canvas.width = 0
+      canvas.height = 0
+      renderedRef.current = false
+    }, RELEASE_DELAY_MS)
+    return () => window.clearTimeout(timer)
+  }, [visible])
 
   useEffect(() => {
     const canvas = canvasRef.current
