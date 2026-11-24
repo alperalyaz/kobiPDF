@@ -1,0 +1,70 @@
+# Builds the signed Android App Bundle for Google Play.
+# Runs only for `android-v*` tags and by hand, never for pull requests, so the signing secrets cannot reach
+# code from a fork. The AAB is kept as a workflow artifact (users cannot install an AAB; it goes to Play).
+name: Android bundle
+
+on:
+  push:
+    tags: ['android-v*']
+  workflow_dispatch:
+    inputs:
+      android_build:
+        description: 'Android-only rebuild number for the same version (0-99, goes into versionCode)'
+        required: false
+        default: '0'
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    env:
+      # The Electron binary is not needed to build the web part.
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+      ANDROID_BUILD: ${{ github.event.inputs.android_build || '0' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the web part and copy it into the Android project
+        run: npm run android:sync
+
+      - name: Restore the upload key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+
+      - name: Build the signed bundle
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ runner.temp }}/upload.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew bundleRelease --console=plain
+
+      - name: Remove the upload key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/upload.jks"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kobiPDF-android-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error

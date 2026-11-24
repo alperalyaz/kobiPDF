@@ -22,7 +22,8 @@
     "dist:mac": "npm run icons && npm run build && electron-builder --mac",
     "build:android": "npm run typecheck && npm run pdfjs-assets && electron-vite build --mode android",
     "android:sync": "npm run build:android && cap sync android",
-    "android:run": "npm run android:sync && cap run android"
+    "android:run": "npm run android:sync && cap run android",
+    "android:bundle": "npm run android:sync && cd android && gradlew.bat bundleRelease"
   },
   "devDependencies": {
     "@capacitor/android": "^8.6.2",

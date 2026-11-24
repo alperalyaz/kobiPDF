@@ -1,9 +1,27 @@
 apply plugin: 'com.android.application'
 
 // The version comes from the desktop app's package.json, so both stay in step.
-// versionCode: 0.5.0 -> 500, 1.2.3 -> 10203.
+// versionCode = major*1000000 + minor*10000 + patch*100 + build: 0.5.0 -> 50000, 1.2.3 -> 1020300.
+// `build` (ANDROID_BUILD, 0-99) is for an Android-only rebuild of the same version (Play never accepts a code
+// twice). Play codes can only grow: never shrink this scheme.
 def appVersion = new groovy.json.JsonSlurper().parse(rootProject.file('../package.json')).version
-def appVersionCode = appVersion.tokenize('.').collect { it.replaceAll(/\D.*/, '') as int }.with { it[0] * 10000 + it[1] * 100 + it[2] }
+def versionParts = appVersion.tokenize('.').collect { it.replaceAll(/\D.*/, '') as int }
+def androidBuild = (System.getenv('ANDROID_BUILD') ?: '0') as int
+if (androidBuild < 0 || androidBuild > 99 || versionParts[1] > 99 || versionParts[2] > 99) {
+    throw new GradleException("Version ${appVersion} / ANDROID_BUILD ${androidBuild} does not fit the versionCode scheme")
+}
+def appVersionCode = versionParts[0] * 1000000 + versionParts[1] * 10000 + versionParts[2] * 100 + androidBuild
+
+// Release signing (upload key). Values come from the environment (CI) or from the properties file named by
+// KOBIPDF_KEYSTORE_PROPERTIES (local). The key itself never lives in the repository.
+def signingProps = new Properties()
+def propsPath = System.getenv('KOBIPDF_KEYSTORE_PROPERTIES')
+if (propsPath && file(propsPath).exists()) file(propsPath).withInputStream { signingProps.load(it) }
+def signingValue = { String env, String prop -> System.getenv(env) ?: signingProps.getProperty(prop) }
+def releaseStoreFile = signingValue('ANDROID_KEYSTORE_FILE', 'storeFile')
+def releaseStorePassword = signingValue('ANDROID_KEYSTORE_PASSWORD', 'storePassword')
+def releaseKeyAlias = signingValue('ANDROID_KEY_ALIAS', 'keyAlias')
+def releaseSigningReady = releaseStoreFile && file(releaseStoreFile).exists() && releaseStorePassword && releaseKeyAlias
 
 android {
     namespace = "com.hidroteknik.kobipdf"
@@ -21,11 +39,32 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (releaseSigningReady) {
+                storeFile file(releaseStoreFile)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                // PKCS12 keystores use one password for the store and the key.
+                keyPassword releaseStorePassword
+            }
+        }
+    }
     buildTypes {
         release {
+            // R8 stays off: Capacitor finds plugins (IncomingFilePlugin) by reflection.
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig releaseSigningReady ? signingConfigs.release : null
         }
+    }
+}
+
+// Only a release build needs the upload key; debug builds and IDE sync work without it.
+gradle.taskGraph.whenReady { graph ->
+    def wantsRelease = graph.allTasks.any { it.name ==~ /(bundle|assemble|package)Release.*/ }
+    if (wantsRelease && !releaseSigningReady) {
+        throw new GradleException('Release signing is not set up: point KOBIPDF_KEYSTORE_PROPERTIES at the upload-key properties file (see docs/ANDROID-PLAN.md).')
     }
 }
 
