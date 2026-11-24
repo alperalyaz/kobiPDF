@@ -44,6 +44,18 @@ npm run dist:win
 
 Çıktı `release/` altındadır. macOS için `npm run dist:mac` bir Mac üzerinde çalıştırılır.
 
+## Android
+
+Aynı arayüz Capacitor ile Android'e paketlenir (`android/` klasörü). Telefon sürümü daha dar kapsamlıdır:
+PDF açma ve görüntüleme, metin düzenleme, imza / kaşe, kopya olarak kaydetme ve paylaşma.
+
+```bash
+npm run android:run      # USB ile bağlı telefonda derle ve aç
+npm run android:bundle   # Google Play için .aab
+```
+
+Google Play'de kapalı test aşamasındadır. Ayrıntılar ve durum: [`docs/ANDROID-PLAN.md`](docs/ANDROID-PLAN.md).
+
 ## Lisans
 
 © 2026 Hidroteknik. GNU Affero Genel Kamu Lisansı sürüm 3 (AGPL-3.0) ile dağıtılır. Ayrıntı için `LICENSE` dosyasına bakın.
